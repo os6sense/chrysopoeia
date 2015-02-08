@@ -1,0 +1,10 @@
+duration:1.0;mem stats:false;sys mem stats:false
+module;test;tags;iterations;elapsed
+Chrysopoeia.Parser.Benchmarks;Yaws Parse - wikipedia;;500;2332896
+Chrysopoeia.Parser.Benchmarks;Floki Parse - simple;;100000;1061055
+Chrysopoeia.Parser.Benchmarks;trane Parse - simple;;100000;1166182
+Chrysopoeia.Parser.Benchmarks;Floki Parse - wikipedia;;100;1128312
+Chrysopoeia.Parser.Benchmarks;Eml Parse - simple;;50000;3560247
+Chrysopoeia.Parser.Benchmarks;Yaws Parse - simple;;500000;2720613
+Chrysopoeia.Parser.Benchmarks;Exmerl Parse - simple;;50000;3202597
+Chrysopoeia.Parser.Benchmarks;Eml Parse - wikipedia;;20;1506009
