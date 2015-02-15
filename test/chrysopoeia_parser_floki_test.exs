@@ -2,25 +2,26 @@
 defmodule Chrysopoeia.Parser.Floki.Test do
   use ExUnit.Case
 
-  def assert_eq(left, right) do
-    assert left == right
-  end
+  def assert_eq(left, right), do: assert left == right
+
+  alias Chrysopoeia.Parser.Floki, as: Floki
+  alias Chrysopoeia.Parser.Samples, as: Samples
 
   test "parses well formed html" do
-    Chrysopoeia.Parser.Samples.simple(:html)
-      |> Chrysopoeia.Parser.Floki.parse
-      |> assert_eq Chrysopoeia.Parser.Samples.simple(:parse_tree) 
+    Samples.simple(:html)
+      |> Floki.parse
+      |> assert_eq Samples.simple(:parse_tree) 
   end
 
   test"parses malformed html with closing tag missing" do
-    Chrysopoeia.Parser.Samples.simple_sans_closing(:html)
-      |> Chrysopoeia.Parser.Floki.parse
-      |> assert_eq Chrysopoeia.Parser.Samples.simple_sans_closing(:parse_tree)
+    Samples.simple_sans_closing(:html)
+      |> Floki.parse
+      |> assert_eq Samples.simple_sans_closing(:parse_tree)
   end
 
   test"parses malformed html with closing tag overlapping" do
-    Chrysopoeia.Parser.Samples.simple_overlapping(:html)
-      |> Chrysopoeia.Parser.Floki.parse
-      |> assert_eq Chrysopoeia.Parser.Samples.simple_overlapping(:parse_tree)
+    Samples.simple_overlapping(:html)
+      |> Floki.parse
+      |> assert_eq Samples.simple_overlapping(:parse_tree)
   end
 end

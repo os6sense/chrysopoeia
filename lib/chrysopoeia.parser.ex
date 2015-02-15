@@ -1,6 +1,3 @@
-require Exmerl
-require Floki 
-require Eml
 
 defmodule Chrysopoeia.Parser do
   use Behaviour
@@ -8,18 +5,24 @@ defmodule Chrysopoeia.Parser do
 end
 
 defmodule Chrysopoeia.Parser.Eml do
+  require Eml
+
   def parse(binary) do
     binary |> Eml.parse
   end
 end
 
 defmodule Chrysopoeia.Parser.Floki do
+  require Floki 
+
   def parse(binary) do
     binary |> Floki.parse
   end
 end
 
 defmodule Chrysopoeia.Parser.XML do
+  require Exmerl
+
   def parse(binary) do
     binary |> Exmerl.parse
   end

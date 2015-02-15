@@ -1,26 +1,23 @@
 
-defmodule Chrysopoeia.Parser.Floki.Test do
+defmodule Chrysopoeia.Parser.ParseTree.Test do
   use ExUnit.Case
 
   def assert_eq(left, right) do
     assert left == right
   end
 
-  test "parses well formed html" do
-     Chrysopoeia.Parser.Samples.simple
-      |> Chrysopoeia.Parser.Floki.parse
-      |> assert_eq {"html", [], [{"head", [], []}, {"body", [], [{"p", [], ["Test"]}]}]}
+  alias Chrysopoeia.Parser.ParseTree, as: ParseTree
+
+  test "walk" do
+    Chrysopoeia.Parser.Samples.simple(:parse_tree)
+      |> ParseTree.walk 
+      |> assert_eq Chrysopoeia.Parser.Samples.simple(:parse_tree)
   end
 
-  #test"parses malformed html with closing tag missing" do
-     #Chrysopoeia.Parser.Samples.simple_sans_closing
-      #|> Chrysopoeia.Parser.Floki.parse
-      #|> assert_eq {"html", [], [{"head", [], []}, {"body", [], [{"p", [], [{"i", [], ["Test"]}]}]}]}
-  #end
+  test "find" do
+    Chrysopoeia.Parser.Samples.simple(:parse_tree)
+      |> ParseTree.find("p")
+      |> assert_eq Chrysopoeia.Parser.Samples.simple(:parse_tree)
+  end
 
-  #test"parses malformed html with closing tag overlapping" do
-     #Chrysopoeia.Parser.Samples.simple_overlapping
-      #|> Chrysopoeia.Parser.Floki.parse
-      #|> assert_eq {"html", [], [{"head", [], []}, {"body", [], [{"p", [], [{"i", [], ["Test"]}]}]}]}
-  #end
 end
