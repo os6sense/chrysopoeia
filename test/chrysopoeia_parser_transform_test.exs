@@ -17,9 +17,9 @@ defmodule Chrysopoeia.Parser.Transform.Test do
 
     transforms = [transform]
 
-    #{"p", [{"class", "tc"}, {"id", "id_1"}], ["test 2"]}
-      #|> Transform.transform( transforms )
-      #|> assert_eq [{"p", [{"class", "tc"}, {"id", "abcde"}], ["test 2"]}]
+    {"p", [{"class", "tc"}, {"id", "id_1"}], ["test 2"]}
+      |> Transform.transform( transforms )
+      |> assert_eq {"p", [{"class", "tc"}, {"id", "abcde"}], ["test 2"]}
   end
 end
 
