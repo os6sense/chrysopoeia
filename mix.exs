@@ -32,6 +32,7 @@ defmodule Chrysopoeia.Mixfile do
      {:floki, "~> 0.0.5"},
      {:exmerl, "~> 0.1.1"},
      {:eml, "~> 0.7.1"},
+     {:zipper_tree, "~>0.1.1"},
     ]
   end
 end

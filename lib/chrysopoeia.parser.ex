@@ -18,6 +18,10 @@ defmodule Chrysopoeia.Parser.Floki do
   def parse(binary) do
     binary |> Floki.parse
   end
+
+  def to_zipper(parse_tree) do
+
+  end
 end
 
 defmodule Chrysopoeia.Parser.XML do

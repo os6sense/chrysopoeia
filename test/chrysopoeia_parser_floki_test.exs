@@ -24,4 +24,13 @@ defmodule Chrysopoeia.Parser.Floki.Test do
       |> Floki.parse
       |> assert_eq Samples.simple_overlapping(:parse_tree)
   end
+  
+  test"parses deeply nested html" do
+    Samples.deep_nesting(:html)
+      |> Floki.parse
+      |> assert_eq Samples.deep_nesting(:parse_tree)
+  end
+
+
+
 end
