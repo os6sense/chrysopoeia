@@ -23,10 +23,10 @@ defmodule Chrysopoeia.Parser.ParseTree.Test do
 
   # Find isnt working because the application of functions to the structure
   # relies on a broken walker.
-  #test "find" do
-    #Chrysopoeia.Parser.Samples.simple(:parse_tree)
-      #|> ParseTree.find("p")
-      #|> assert_eq Chrysopoeia.Parser.Samples.simple(:parse_tree)
-  #end
+  test "Find" do
+    Chrysopoeia.Parser.Samples.simple(:parse_tree)
+      |> ParseTree.find("p")
+      |> assert_eq Chrysopoeia.Parser.Samples.simple(:only_ps)
+  end
 
 end

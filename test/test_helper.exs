@@ -11,6 +11,10 @@ defmodule Chrysopoeia.Parser.Samples do
     {"html", [], [{"head", [], []}, {"body", [], [{"p", [], ["Test"]}, {"p", [{"class", "tc"}, {"id", "id_1"}], ["test 2"]}]}]}
   end
 
+  def simple(:only_ps) do
+    [{"p", [], ["Test"]}, {"p", [{"class", "tc"}, {"id", "id_1"}], ["test 2"]}]
+  end
+
   def deep_nesting(:html) do
     """
       <html>
