@@ -87,7 +87,7 @@ Transforms - macros and functions to apply the transforms to the tree
 3) Nodes
 4) Inserts
 
-
+ 
 Important operators
 - select value of current node (e.g. .)
 - concatination on current value
@@ -101,6 +101,8 @@ For an api it seems that I want to use the tuple notation. e.g.
                to 1, 2, 3, and 4; ASSUMING that 4 values were matched by the
                selector
 
+model[:blah] - We want compatability, at a later date with assigns[:thing] as
+               in Phoenix.Conn, so for now we will use model as an alias for assigns
 
 transforms = MyTranformations.init("local.html")
 transformed = Transforms.apply(conn, transforms)
@@ -114,17 +116,17 @@ deftransforms MyTranformations do
       |> Chrysopoeia.Template.store
   end
 
-  // another useful macro might be the transform order allowing it to be
-  // overridden/changed.
+# another useful macro might be the transform order allowing it to be 
+# overridden/changed.
   def transform_order do
     [:deletes, :text_and_arguments, :nodes, :inserts]
   end
 
-  // conn?
-  // what about TRs?
-  // repeating
-  // e.g. <tr></td></td></td></td></td></td></td></td></tr>
-  // would get filed with {name, date, qty, price}
+# conn?
+# what about TRs?
+# repeating
+# e.g. <tr></td></td></td></td></td></td></td></td></tr>
+# would get filed with {name, date, qty, price}
   transform_nodes stock_table("table[id=table_1]/tr/td") do
       {name, date, qty, price} = Model.get(model, :price_data)
   end
@@ -132,22 +134,21 @@ deftransforms MyTranformations do
   # e.g. <div id="hl"><span></span><span></span></div>
   # The spans would be replaced with the values from the tupple
   transform_node headline("div[id=hl]/span") do
-      { Model.get(model, :main_heading), Model.get(model, :subtitle) } 
+      { model[:main_heading], model[:subtitle] } 
   end
-
 
   transform_argument p_args("input[name=_csrf_token]") do
     {:value, Model.get(model, :csrf_token}
     if assigns[:somevalue] do
-      set_arg("value", Model.get(model, :something)
+      set_arg("value", model[:something])
     end
   end
   
   transform_argument form_action("form[id=main]") do
-   if Model.get(model, :action) == :create
-     {:action, "/#{Model.get(model, :resource_name)}"}
+   if model[:action] == :create
+     {:action, "/#{model[:resource_name]}"}
    else
-     {:action, "/#{Model.get(model, :resource_name)}/#{Model.get(model, :resource_id)}"}
+     {:action, "/#{model[:resource_name]}/#{model[:resource_id]}"}
    end
   end
 
@@ -163,7 +164,7 @@ deftransforms MyTranformations do
     insert_transformed(file | url, Transforms)
 
   insert add_form_patch("form[id=main]") do
-    if Model.get(model, :action) != :create
+    if model[:action] != :create
       "<input name="_method" type="hidden" value="patch" />"
     end
   end
@@ -183,7 +184,7 @@ deftransforms MyTranformations do
   # transform
 
   delete hidden_field("id=hidden_field" do 
-    if Model.get(model, :action) != :create
+    if model[:action] != :create
 
     end
   end

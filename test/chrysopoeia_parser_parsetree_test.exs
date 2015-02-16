@@ -36,19 +36,22 @@ defmodule Chrysopoeia.Parser.ParseTree.Test do
       |> assert_eq {"html", [], [{"head", [], []}, {"body", [], []}]}
   end
 
-  #test "Delete - Deep Nesting" do
-    #Sample.deep_nesting(:parse_tree)
-      #|> ParseTree.delete("span")
-      #|> assert_eq {"tml", [], [{"head", [], []}, {"body", [], []}]}
-  #end
-
+  test "Delete - Deep Nesting" do
+    Sample.deep_nesting(:parse_tree)
+      |> ParseTree.delete("img")
+      |> ParseTree.delete("a")
+      |> ParseTree.delete("br")
+      |> ParseTree.delete("span")
+      |> ParseTree.delete("garbage")
+      |> assert_eq {"html", [], [{"head", [], []}, {"body", [], [{"div", [{"id", "deep_span"}], []}]}]}
+  end
 
   # Find isnt working because the application of functions to the structure
   # relies on a broken walker.
-  #test "Find" do
-    #Chrysopoeia.Parser.Samples.simple(:parse_tree)
-      #|> ParseTree.find("p")
-      #|> assert_eq Chrysopoeia.Parser.Samples.simple(:only_ps)
-  #end
+  test "Find - simple" do
+    Sample.simple(:parse_tree)
+      |> ParseTree.find("p")
+      |> assert_eq Sample.simple(:only_ps)
+  end
 
 end

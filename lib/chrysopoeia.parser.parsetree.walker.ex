@@ -4,7 +4,7 @@ defmodule Chrysopoeia.Parser.ParseTree.Walker do
   """
     Methods for walking the parsetree
   """
-  import IO, only: [puts: 1]
+  #import IO, only: [puts: 1]
 
   defmacro function(:copy) do
     quote do
@@ -26,9 +26,10 @@ defmodule Chrysopoeia.Parser.ParseTree.Walker do
 
   defmacro function(:find, name) do
      quote do
-      fn(t, a) -> 
-        Logger.debug "find: #{inspect t} #{inspect a}"
-        if e == unquote(name), do: t 
+      fn(t = {e, a, c}, acc) -> 
+        if e == unquote(name), do: acc = acc ++ t 
+        Logger.debug "find: #{inspect t} -- #{inspect acc}"
+        t
       end
     end
   end
@@ -70,7 +71,8 @@ defmodule Chrysopoeia.Parser.ParseTree.Walker do
     Add the (e)lement and (a)rguments to the accumulator, apply the walk
     function to the tuple elements within the list c
   """
-  def _walk(t = {e, a, c = [head | tail]}, fns, acc) when is_list(c) do
+  #def _walk(t = {e, a, c = [head | tail]}, fns, acc) when is_list(c) do
+  def _walk(t = {e, a, c}, fns, acc) when is_list(c) do
     Logger.debug "List Walk - #{inspect e}"
     {e, a, c} = reduce_node(fns, t)
 
@@ -87,11 +89,10 @@ defmodule Chrysopoeia.Parser.ParseTree.Walker do
   def _walk(t = {_, _, []}, fns, acc) do
     Logger.debug "Empty Last Element (fns) #{inspect t}"
     reduce_node(fns, t)
-    #Enum.reduce([[]] ++ fns, fn(fun, r_acc) -> fun.(t, r_acc) end)
   end
 
   @doc ~S"""
-
+    Matches a totally empty element.
   """
   def _walk({}, _fns, _acc) do
     Logger.debug "Empty Element (fns)"
@@ -99,15 +100,14 @@ defmodule Chrysopoeia.Parser.ParseTree.Walker do
   end
 
   # -------- Helpers --------
-  # 
+  # ========================= 
   # Used by Enum.filter to remove tupple with :delete as the first value
   defp fn_filter_child({e, a, c}), do: e != :delete
   defp fn_filter_child(text) when is_binary(text), do: true
+  defp fn_filter_child(nil), do: false
 
   # Apply the fncs to the node - really only useful for text nodes
   # or those without children
   defp reduce_node(fns, t), 
     do: Enum.reduce([[]] ++ fns, fn(fun, r_acc) -> fun.(t, r_acc) end)
-
-
 end
