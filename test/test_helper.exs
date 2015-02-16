@@ -3,6 +3,38 @@ ExUnit.start()
 # Concentrating on F~oki and YAML
 defmodule Chrysopoeia.Parser.Samples do
 
+  def empty(:html) do
+    ""
+  end
+
+  def empty(:parse_tree) do
+    {}
+  end
+
+  def empty_html(:html) do
+    "<html></html>"
+  end
+
+  def empty_html(:parse_tree) do
+    {"html", [], []}
+  end
+
+  def single_empty_node(:html) do
+    "<html><div></div></html>"
+  end
+  
+  def single_empty_node(:parse_tree) do
+    {"html", [], [{"div>", [], []}]}
+  end
+
+  def single_text_node(:html) do
+    "<html><div>text</div></html>"
+  end
+  
+  def single_text_node(:parse_tree) do
+    {"html", [], [{"div>", [], ["text"]}]}
+  end
+
   def simple(:html) do
     "<html><head></head><body><p>Test</p><p class=\"tc\" id=\"id_1\">test 2</p></body></html>"
   end
