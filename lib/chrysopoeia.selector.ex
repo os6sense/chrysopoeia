@@ -38,14 +38,13 @@ E:only-of-type          an E element, only sibling of its type
 E:empty                 an E element that has no children (including text nodes)
 
 """
-defmodule Chrysopoeia.Selector.CSS do
+defmodule Chrysopoeia.Selector.Elixir.CSS do
 
   def match(t = {_,_,_}, selectors) do
     true
   end
 
   @doc ~S"""
-
 
   """
   def parse(sel) do

@@ -1,5 +1,13 @@
 ExUnit.start()
 
+defmodule SaneAsserts do
+  use ExUnit.Case
+
+  def assert_eq(left, right) do
+    assert left == right
+  end
+end
+
 # Concentrating on F~oki and YAML
 defmodule Chrysopoeia.Parser.Samples do
 
