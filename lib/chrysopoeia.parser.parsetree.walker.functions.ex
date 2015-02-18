@@ -2,17 +2,6 @@
 defmodule Chrysopoeia.Parser.ParseTree.Walker.Functions do
   require Logger
 
-  #defmacro function(:copy) do
-    #quote do
-      #{:transform, fn
-          #(t, a) -> 
-            #Logger.debug "copy: #{inspect t} -- #{inspect a}"
-            #{t, a}
-          #end
-      #}
-    #end
-  #end
-
   def function(:copy) do
       {:transform, fn
           (t, a) -> 
@@ -22,17 +11,6 @@ defmodule Chrysopoeia.Parser.ParseTree.Walker.Functions do
       }
   end
 
-  #defmacro function(:delete, name) do
-    #quote do
-      #{:delete, fn
-        #(t = {e, a, c}, acc) -> 
-           #Logger.debug "delete: #{inspect e} -- #{inspect unquote(name)}"
-           #unless e == unquote(name), do: {t, acc}, else: {{:delete, [], []}, acc}
-        #end
-      #}
-    #end
-  #end
-  
   def function(:delete, name) do
     {:delete, fn
       (t = {e, a, c}, acc) -> 
@@ -42,29 +20,11 @@ defmodule Chrysopoeia.Parser.ParseTree.Walker.Functions do
     }
   end
 
-
-  #defmacro function(:find, name) do
-    #quote do
-      #{:query, fn
-        #(t = {e, a, c}, acc) -> 
-          #Logger.debug "find A: #{inspect t} -- #{inspect acc}"
-          #if e == unquote(name) do
-            #acc = acc ++ [t]
-          #end
-
-          #Logger.debug "find B: #{inspect t} -- #{inspect acc}"
-          #{t, acc}
-        #end
-      #}
-    #end
-  #end
-
   def function(:find, name) do
       {:query, fn
         (t = {e, a, c}, acc) -> 
           Logger.debug "find A: #{inspect t} -- #{inspect acc}"
           if e == name do
-            #acc = acc ++ [t]
             acc = update_accumulator(acc, t)
           end
 
@@ -75,12 +35,16 @@ defmodule Chrysopoeia.Parser.ParseTree.Walker.Functions do
   end
 
   def update_accumulator(acc, t) when is_tuple(t) do
-    Keyword.update(acc, :accumulator, [t], fn(c) -> c ++ t end) 
+    Keyword.update(acc, :accumulator, [], fn(c) -> c ++ [t] end) 
   end
 
-  #def update_accumulator(acc, t) when is_integer(t) do
-    #Keyword.update(acc, :index, 0, fn(_) -> t end)
-  #end
+  def reset_index(acc, 0) do
+    Keyword.update(acc, :index, 0, fn(n) -> 0 end)
+  end
+
+  def increment_index(acc, t) when is_integer(t) do
+    Keyword.update(acc, :index, 0, fn(n) -> n + t end)
+  end
 
   def update_accumulator([], t) when is_list(t), do: t
   def update_accumulator(acc, t) when is_list(t) do

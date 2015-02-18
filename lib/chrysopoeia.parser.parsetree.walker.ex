@@ -63,8 +63,9 @@ defmodule Chrysopoeia.Parser.ParseTree.Walker do
   @spec walk(Tuple, List) :: Tuple
   def walk(pt, fns \\ [Functions.function(:copy)]) when is_tuple(pt) do
     Logger.debug "Walk"
+    
     # BUG: at some point we are initialising the accumulator
-    _walk(pt, Functions.order(fns), nil, [])
+    _walk(pt, Functions.order(fns), [{:accumulator, []}, {:index, 0}], [])
   end
 
   @doc ~S""" 
@@ -81,7 +82,7 @@ defmodule Chrysopoeia.Parser.ParseTree.Walker do
     Logger.debug "TEXT NODE 3 - #{inspect t} -- #{inspect acc}"
     meta = update_meta(meta, t)
     Logger.debug "TEXT NODE 3 META: #{inspect meta }"
-    reduce_node(fns, t)
+    reduce_node(fns, t, acc)
   end
 
   @doc ~S"""
@@ -92,24 +93,29 @@ defmodule Chrysopoeia.Parser.ParseTree.Walker do
     Logger.debug "List Walk A - #{inspect e} -- #{inspect acc}"
     Logger.debug "META: #{inspect meta}"
 
-    {{e, a, c}, acc} = reduce_node(fns, t)
+    {{e, a, c}, acc} = reduce_node(fns, t, acc)
 
     Logger.debug "List Walk B - #{inspect e} -- acc: #{inspect acc}"
 
+    acc = Functions.reset_index(acc, 0)
     unless e == :delete do
       #{children, acc} = Enum.map_reduce(c, [], fn
       {children, acc} = Enum.map_reduce(c, acc, fn
         (child, mr_acc) -> 
           Logger.debug "List Walk Map Reduce - C:#{inspect child} -- r_acc:#{inspect mr_acc}."
 
-          {t, a1} = _walk(child, fns, mr_acc, update_meta(meta, {e, a, c}) )
-          {t, Functions.update_accumulator(mr_acc, a1)} 
+          mr_acc = Functions.increment_index(mr_acc, 1)
+
+          _walk(child, fns, mr_acc, update_meta(meta, {e, a, c}) )
+          
+          #{t, a1} = _walk(child, fns, mr_acc, update_meta(meta, {e, a, c}) )
+          #{t, Functions.update_accumulator(mr_acc, a1)} 
       end)
 
       { {e, a, Enum.filter(children, &fn_filter_child/1)}, acc}
     else
-      # :delete, unless its the html tag, will get parsed by the calling _walk
-      {{e, a, c}, acc}
+      {{e, a, c}, acc} # :delete, unless its the html tag, will get parsed 
+                       # by the calling _walk
     end
   end
 
@@ -120,7 +126,7 @@ defmodule Chrysopoeia.Parser.ParseTree.Walker do
     Logger.debug "Empty Last Element (fns) #{inspect t}"
     meta = update_meta(meta, t)
     Logger.debug "EMPTY LAST ELEMENT META: #{inspect meta }"
-    reduce_node(fns, t)
+    reduce_node(fns, t, acc)
   end
 
   @doc ~S"""
@@ -141,8 +147,8 @@ defmodule Chrysopoeia.Parser.ParseTree.Walker do
 
   # Apply the fncs to the node - really only useful for text nodes or those
   # without children
-  defp reduce_node(fns, t) do
-    Enum.reduce([[]] ++ fns, fn
+  defp reduce_node(fns, t, acc) do
+    Enum.reduce([acc] ++ fns, fn
       ({tag, fun}, r_acc) -> fun.(t, r_acc) 
     end)
   end
@@ -156,5 +162,4 @@ defmodule Chrysopoeia.Parser.ParseTree.Walker do
   defp fn_filter_child({{e, _a, _c}, acc}), do: e != :delete
   defp fn_filter_child(text) when is_binary(text), do: true
   defp fn_filter_child(nil), do: false
-
 end

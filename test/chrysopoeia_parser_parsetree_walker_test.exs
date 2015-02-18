@@ -7,7 +7,7 @@ defmodule Chrysopoeia.Parser.ParseTree.Walker.Test do
   alias Chrysopoeia.Parser.Samples, as: Sample
 
   def assert_walk_does_not_change(parse_tree), 
-    do: parse_tree |> Walker.walk |> assert_eq {parse_tree, []}
+    do: parse_tree |> Walker.walk |> elem(0) |> assert_eq parse_tree
 
   test "empty", 
     do: assert_walk_does_not_change Sample.empty(:parse_tree)
