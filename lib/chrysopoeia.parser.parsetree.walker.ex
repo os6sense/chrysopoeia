@@ -63,9 +63,7 @@ defmodule Chrysopoeia.Parser.ParseTree.Walker do
   """
   @spec walk(Tuple, List) :: Tuple
   def walk(pt, fns \\ [Functions.function(:copy)]) when is_tuple(pt) do
-    Logger.debug "Walk"
-    
-    # BUG: at some point we are initialising the accumulator
+    Logger.debug "---------------- NEW WALK ------------------"
     _walk(pt, Functions.order(fns), Accumulator.create , [])
   end
 
@@ -73,48 +71,40 @@ defmodule Chrysopoeia.Parser.ParseTree.Walker do
     matches a text node. 
   """
   def _walk(text , _fns, acc, meta) when is_binary(text) do
-    Logger.debug "TEXT NODE 2 - #{inspect text} || #{String.strip(text)}"
-    Logger.debug "TEXT NODE 2 META: #{inspect meta}"
+    #Logger.debug "TEXT NODE 2 - #{inspect text} || #{String.strip(text)}"
+    #Logger.debug "TEXT NODE 2 META: #{inspect meta}"
     {String.strip(text), acc}
   end
     
   # matches a text node with children
   def _walk(t = { _, _, [c]}, fns, acc, meta) when is_binary(c) do
-    Logger.debug "TEXT NODE 3 - #{inspect t} -- #{inspect acc}"
-    meta = update_meta(meta, t)
-    Logger.debug "TEXT NODE 3 META: #{inspect meta }"
-    reduce_node(fns, t, acc)
+    #Logger.debug "TEXT NODE 3 - #{inspect t} -- META: #{inspect meta}"
+    apply_functions(fns, t, update_meta(meta, t), acc)
   end
 
   @doc ~S"""
-    Add the (e)lement and (a)rguments to the accumulator, apply the walk
+    Add the (e)lement [and (a)rguments to the accumulator?], apply the walk
     function to the tuple elements within the list c
   """
   def _walk(t = {e, _a, c}, fns, acc, meta) when is_list(c) do
-    Logger.debug "List Walk A - #{inspect e} -- #{inspect acc}"
-    Logger.debug "META: #{inspect meta}"
+    #Logger.debug "LW A - #{inspect e} -- #{inspect acc}"
+    #Logger.debug "LW META: #{inspect meta}" 
+   
+    {{e, a, c}, acc} = apply_functions(fns, t, meta, acc)
 
-    {{e, a, c}, acc} = reduce_node(fns, t, acc)
+    #Logger.debug "LW B - #{inspect e} -- acc: #{inspect acc}"
+    #Logger.debug "LW META: #{inspect meta}" 
 
-    Logger.debug "List Walk B - #{inspect e} -- acc: #{inspect acc}"
-
-    acc = Accumulator.reset_index(acc)
     unless e == :delete do
-      #{children, acc} = Enum.map_reduce(c, [], fn
-      {children, acc} = Enum.map_reduce(c, acc, fn
-        (child, mr_acc) -> 
-          Logger.debug "List Walk Map Reduce - C:#{inspect child} -- r_acc:#{inspect mr_acc}."
-
-          mr_acc = Accumulator.increment_index(mr_acc, 1)
-
-          _walk(child, fns, mr_acc, update_meta(meta, {e, a, c}) )
-          
-          #{t, a1} = _walk(child, fns, mr_acc, update_meta(meta, {e, a, c}) )
-          #{t, Functions.update_accumulator(mr_acc, a1)} 
+      {children, {acc, idx}} = Enum.map_reduce(c, {acc, 1}, fn
+        (child, {lacc, idx}) -> 
+          {r_tree, r_acc} = _walk(child, fns, lacc, update_meta(meta, {e, a, c}, idx))
+          {r_tree, {r_acc, idx + 1}}
       end)
-
-      { {e, a, Enum.filter(children, &fn_filter_child/1)}, acc}
+      #Logger.debug "LW -- LEAVING #{e} #{inspect acc}\n"
+      {{e, a, Enum.filter(children, &fn_filter_child/1)}, acc}
     else
+      #Logger.debug "LW -- LEAVING #{e}\n"
       {{e, a, c}, acc} # :delete, unless its the html tag, will get parsed 
                        # by the calling _walk
     end
@@ -124,34 +114,29 @@ defmodule Chrysopoeia.Parser.ParseTree.Walker do
     Matches the tuple with no children (i.e an empty list) as the last element.
   """
   def _walk(t = {_, _, []}, fns, acc, meta) do
-    Logger.debug "Empty Last Element (fns) #{inspect t}"
-    meta = update_meta(meta, t)
-    Logger.debug "EMPTY LAST ELEMENT META: #{inspect meta }"
-    reduce_node(fns, t, acc)
+    #Logger.debug "LAST ELEMENT (empty) #{inspect t}"
+    apply_functions(fns, t, update_meta(meta, t), acc)
   end
 
   @doc ~S"""
     Matches a totally empty element.
   """
-  def _walk({}, _fns, _acc, meta) do
-    Logger.debug "EMPTY ELEMENT"
+  def _walk({}, _fns, _acc, _meta) do
+    #Logger.debug "EMPTY ELEMENT"
     {{}, []}
   end
 
-  # {[path], ["E", "P", "P", "P", "E", "F" *, "E", "F", "P"], {6, 9}, {1, 2}} 
-  # on decent the children become the siblings and the children are replaced.
-  defp update_meta(meta, t = {e, a, c}) do
+  # On decent the children become the siblings and the children are replaced.
+  defp update_meta(meta,  {e, _a, c}, i \\ 0) do
+    c_len = length(c)
     [ {:path, (meta[:path] || []) ++ [{e}] },
-      {:children, {Enum.map(c, fn({e, a, _}) -> e; (t) -> "TEXT" end), 0, length(c)} },
+      {:children, {Enum.map(c, fn({e, _a, _}) -> e; (_) -> "TEXT" end), i, c_len} },
       {:siblings, meta[:children] || {[], 0, 0} } ]
   end
 
-  # Apply the fncs to the node - really only useful for text nodes or those
-  # without children
-  defp reduce_node(fns, t, acc) do
-    Enum.reduce([acc] ++ fns, fn
-      ({tag, fun}, r_acc) -> fun.(t, r_acc) 
-    end)
+  # Apply the fncs to the node 
+  defp apply_functions(fns, t = {e, a, c}, meta, acc) do
+    Enum.reduce([acc] ++ fns, fn({_tag, fun}, lacc) -> fun.({e, a, c}, meta, lacc) end)
   end
 
   # ========================= 
@@ -160,7 +145,7 @@ defmodule Chrysopoeia.Parser.ParseTree.Walker do
   # NB: I may need meta/path here
   # Used by Enum.filter to remove tupple with :delete as the first value
   defp fn_filter_child({e, _a, _c}), do: e != :delete
-  defp fn_filter_child({{e, _a, _c}, acc}), do: e != :delete
+  defp fn_filter_child({{e, _a, _c}, _acc}), do: e != :delete
   defp fn_filter_child(text) when is_binary(text), do: true
   defp fn_filter_child(nil), do: false
 end

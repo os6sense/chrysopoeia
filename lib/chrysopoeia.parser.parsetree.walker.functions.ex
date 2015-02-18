@@ -5,16 +5,16 @@ defmodule Chrysopoeia.Parser.ParseTree.Walker.Functions do
 
   def function(:copy) do
       {:transform, fn
-          (t, a) -> 
-            Logger.debug "copy: #{inspect t} -- #{inspect a}"
-            {t, a}
+          (t = {e, a, c}, meta, acc) -> 
+            Logger.debug "COPY: #{inspect e} #{inspect a} -- META: #{inspect meta}"
+            {t, acc}
           end
       }
   end
 
   def function(:delete, name) do
     {:delete, fn
-      (t = {e, a, c}, acc) -> 
+      (t = {e, _a, _c}, meta, acc) -> 
          Logger.debug "delete: #{inspect e} -- #{inspect name}"
          unless e == name, do: {t, acc}, else: {{:delete, [], []}, acc}
       end
@@ -23,7 +23,7 @@ defmodule Chrysopoeia.Parser.ParseTree.Walker.Functions do
 
   def function(:find, name) do
       {:query, fn
-        (t = {e, a, c}, acc) -> 
+        (t = {e, _a, _c}, meta, acc) -> 
 
           Logger.debug "find A: #{inspect t} -- #{inspect acc}"
 

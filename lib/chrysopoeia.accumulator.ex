@@ -10,7 +10,7 @@ defmodule Chrysopoeia.Accumulator do
     do: [{:accumulator, []}, {:index, 0}]
 
   def reset_index(acc, val \\ 0),   
-    do: Keyword.update(acc, :index, val, fn(n) -> 0 end)
+    do: Keyword.update(acc, :index, val, fn(_) -> 0 end)
 
   def increment_index(acc, t) when is_integer(t), 
     do: Keyword.update(acc, :index, 0, fn(n) -> n + t end)
@@ -22,7 +22,7 @@ defmodule Chrysopoeia.Accumulator do
   def update_accumulator(acc, t) when is_list(t) do
     acc
      |> Keyword.update(:accumulator, [], fn(c) -> c ++ t[:accumulator] end)
-     |> Keyword.update(:index, 0, fn(c) -> t[:index] end)
+     |> Keyword.update(:index, 0, fn(_) -> t[:index] end)
   end
 end
 
