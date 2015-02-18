@@ -34,10 +34,8 @@ defmodule Chrysopoeia.Parser.ParseTree.Walker.Functions do
       }
   end
 
-  def update_accumulator(acc, t) when is_tuple(t) do
-    Keyword.update(acc, :accumulator, [], fn(c) -> c ++ [t] end) 
-  end
 
+  # We have a little accumulator module here boys and girls!
   def reset_index(acc, 0) do
     Keyword.update(acc, :index, 0, fn(n) -> 0 end)
   end
@@ -46,6 +44,9 @@ defmodule Chrysopoeia.Parser.ParseTree.Walker.Functions do
     Keyword.update(acc, :index, 0, fn(n) -> n + t end)
   end
 
+  def update_accumulator(acc, t) when is_tuple(t) do
+    Keyword.update(acc, :accumulator, [], fn(c) -> c ++ [t] end) 
+  end
   def update_accumulator([], t) when is_list(t), do: t
   def update_accumulator(acc, t) when is_list(t) do
     acc
