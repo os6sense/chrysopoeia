@@ -1,6 +1,7 @@
 
 defmodule Chrysopoeia.Parser.ParseTree.Walker.Functions do
   require Logger
+  require Chrysopoeia.Accumulator, as: Accumulator
 
   def function(:copy) do
       {:transform, fn
@@ -23,10 +24,11 @@ defmodule Chrysopoeia.Parser.ParseTree.Walker.Functions do
   def function(:find, name) do
       {:query, fn
         (t = {e, a, c}, acc) -> 
+
           Logger.debug "find A: #{inspect t} -- #{inspect acc}"
-          if e == name do
-            acc = update_accumulator(acc, t)
-          end
+
+          if e == name, 
+            do: acc = Accumulator.update_accumulator(acc, t)
 
           Logger.debug "find B: #{inspect t} -- #{inspect acc}"
           {t, acc}
@@ -34,25 +36,6 @@ defmodule Chrysopoeia.Parser.ParseTree.Walker.Functions do
       }
   end
 
-
-  # We have a little accumulator module here boys and girls!
-  def reset_index(acc, 0) do
-    Keyword.update(acc, :index, 0, fn(n) -> 0 end)
-  end
-
-  def increment_index(acc, t) when is_integer(t) do
-    Keyword.update(acc, :index, 0, fn(n) -> n + t end)
-  end
-
-  def update_accumulator(acc, t) when is_tuple(t) do
-    Keyword.update(acc, :accumulator, [], fn(c) -> c ++ [t] end) 
-  end
-  def update_accumulator([], t) when is_list(t), do: t
-  def update_accumulator(acc, t) when is_list(t) do
-    acc
-     |> Keyword.update(:accumulator, [], fn(c) -> c ++ t[:accumulator] end)
-     |> Keyword.update(:index, 0, fn(c) -> t[:index] end)
-  end
 
   @doc ~S"""
     Order the list of function tuples fns by the atom order in fns_order

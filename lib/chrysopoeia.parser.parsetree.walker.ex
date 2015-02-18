@@ -47,6 +47,7 @@ defmodule Chrysopoeia.Parser.ParseTree.Walker do
   """
   require Logger
   require Chrysopoeia.Parser.ParseTree.Walker.Functions, as: Functions
+  require Chrysopoeia.Accumulator, as: Accumulator
 
   @doc ~S"""
     pt:  As described above.
@@ -65,7 +66,7 @@ defmodule Chrysopoeia.Parser.ParseTree.Walker do
     Logger.debug "Walk"
     
     # BUG: at some point we are initialising the accumulator
-    _walk(pt, Functions.order(fns), [{:accumulator, []}, {:index, 0}], [])
+    _walk(pt, Functions.order(fns), Accumulator.create , [])
   end
 
   @doc ~S""" 
@@ -97,14 +98,14 @@ defmodule Chrysopoeia.Parser.ParseTree.Walker do
 
     Logger.debug "List Walk B - #{inspect e} -- acc: #{inspect acc}"
 
-    acc = Functions.reset_index(acc, 0)
+    acc = Accumulator.reset_index(acc)
     unless e == :delete do
       #{children, acc} = Enum.map_reduce(c, [], fn
       {children, acc} = Enum.map_reduce(c, acc, fn
         (child, mr_acc) -> 
           Logger.debug "List Walk Map Reduce - C:#{inspect child} -- r_acc:#{inspect mr_acc}."
 
-          mr_acc = Functions.increment_index(mr_acc, 1)
+          mr_acc = Accumulator.increment_index(mr_acc, 1)
 
           _walk(child, fns, mr_acc, update_meta(meta, {e, a, c}) )
           
