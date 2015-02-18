@@ -120,6 +120,7 @@ deftransforms MyTranformations do
 # overridden/changed.
   def transform_order do
     [:deletes, :text_and_arguments, :nodes, :inserts]
+    # [:deletes, :transforms, :node_transforms, :inserts]
   end
 
 # conn?

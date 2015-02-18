@@ -3,38 +3,29 @@ defmodule Chrysopoeia.Parser.ParseTree do
   require Logger
 
   require Chrysopoeia.Parser.ParseTree.Walker, as: Walker
-
-  defmacro function(:delete, name) do
-    quote do
-      fn(t = {e, a, c}, acc) -> 
-        Logger.debug "delete: #{inspect e} -- #{inspect unquote(name)}"
-        unless e == unquote(name), do: {t, acc}, else: {{:delete, [], []}, acc}
-      end
-    end
-  end
-
-  defmacro function(:find, name) do
-     quote do
-      fn(t = {e, a, c}, acc) -> 
-        Logger.debug "find A: #{inspect t} -- #{inspect acc}"
-        if e == unquote(name), do: acc = acc ++ [t]
-        Logger.debug "find B: #{inspect t} -- #{inspect acc}"
-        {t, acc}
-      end
-    end
-  end
+  require Chrysopoeia.Parser.ParseTree.Walker.Functions, as: Functions
 
   def walk(t),      do: Walker.walk(t) |> elem(0)
   def walk(t, fns), do: Walker.walk(t, fns) |> elem(0)
 
   def find(parse_tree, selector_fn) do
-    Walker.walk(parse_tree, [function(:find, selector_fn)])
+    Walker.walk(parse_tree, [Functions.function(:find, selector_fn)])
   end
 
   def delete(parse_tree, selector_fn) do
-    Walker.walk(parse_tree, [function(:delete, selector_fn)]) 
+    Walker.walk(parse_tree, [Functions.function(:delete, selector_fn)]) 
       |> elem(0)
   end
+
+  # insert a text node
+  def insert(parse_tree, selector_fn, fragment) when is_binary(fragment) do
+    # convert text fragment to parse_tree
+  end
+
+  # insert a parse_tree_fragment
+  def insert(parse_tree, selector_fn, fragment) when is_tuple(fragment) do
+  end
+
 
   def to_html(parse_tree) do
     Walker.walk(parse_tree) 
