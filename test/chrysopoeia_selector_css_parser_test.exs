@@ -1,13 +1,12 @@
 
 
-defmodule Chrysopoeia.Selector.CSS.Test do
+defmodule Chrysopoeia.Selector.CSS.Parser.Test do
   use ExUnit.Case
 
-  @nil_val ""
   def assert_eq(left, right), do: assert left == right
   def assert_neq(left, right), do: assert left != right
 
-  alias Chrysopoeia.Selector.CSS, as: CSS
+  alias Chrysopoeia.Selector.CSS.Parser, as: CSS
 
   def single_split(str, attr \\ ["type", "attr", "op", "value"]) do
     str |> CSS.split |> List.first |> Map.take(["type", "attr", "op", "value"]) 

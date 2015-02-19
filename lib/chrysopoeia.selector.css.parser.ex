@@ -28,11 +28,8 @@ E:only-child            an E element, only child of its parent
 E:only-of-type          an E element, only sibling of its type
 E:empty                 an E element that has no children (including text nodes)
 
-
-
-
 """
-defmodule Chrysopoeia.Selector.CSS do
+defmodule Chrysopoeia.Selector.CSS.Parser do
 
 
   @doc ~S"""
@@ -97,26 +94,13 @@ defmodule Chrysopoeia.Selector.CSS do
   end
   
   # Takes a selector string and returns matched groups. 
+  #https://regex101.com/r/xW8tT1/2 - I feel dirty
   defp _do_split(">"), do: ">"
   defp _do_split("+"), do: "+"
   defp _do_split("~"), do: "~"
   defp _do_split(str) when is_binary(str) do
     str = normalise(str)
-    #https://regex101.com/r/xW8tT1/2 - I feel dirty
     ~r/(?<type>[\w\*]+)?([\[](?<attr>\w+)((?<op>[\^$|~\*]?=?)(?<value>[\w]+))?[\]])?([:](?<ptype>[\w\-]+)([\(](?<pval>[\d]+)[\)])?)?/
       |> Regex.named_captures(str)
   end
-
-  #def match(parse_tree, css_selector = "*", fun) do
-  ##    walk(parse_tree, fn(e, a, c) -> true end, fn)
-  #end
-
-  #def match(parse_tree, css_selector = "." <> binary, fun) do
-  #end
-
-  #def match(parse_tree, css_selector = "#" <> binary, fun) do
-  #end
-
-  #def match(parse_tree, css_selector) do
-  #end
 end
