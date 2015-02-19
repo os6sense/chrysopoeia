@@ -79,7 +79,7 @@ defmodule Chrysopoeia.Parser.ParseTree.Walker do
   # matches a text node with children
   def _walk(t = { _, _, [c]}, fns, acc, meta) when is_binary(c) do
     #Logger.debug "TEXT NODE 3 - #{inspect t} -- META: #{inspect meta}"
-    apply_functions(fns, t, update_meta(meta, t), acc)
+    apply_functions(fns, t, update_meta(meta, t, 0), acc)
   end
 
   @doc ~S"""
@@ -98,7 +98,8 @@ defmodule Chrysopoeia.Parser.ParseTree.Walker do
     unless e == :delete do
       {children, {acc, idx}} = Enum.map_reduce(c, {acc, 1}, fn
         (child, {lacc, idx}) -> 
-          {r_tree, r_acc} = _walk(child, fns, lacc, update_meta(meta, {e, a, c}, idx))
+          meta = update_meta(meta, {e, a, c}, idx)
+          {r_tree, r_acc} = _walk(child, fns, lacc, meta)
           {r_tree, {r_acc, idx + 1}}
       end)
       #Logger.debug "LW -- LEAVING #{e} #{inspect acc}\n"
@@ -115,7 +116,7 @@ defmodule Chrysopoeia.Parser.ParseTree.Walker do
   """
   def _walk(t = {_, _, []}, fns, acc, meta) do
     #Logger.debug "LAST ELEMENT (empty) #{inspect t}"
-    apply_functions(fns, t, update_meta(meta, t), acc)
+    apply_functions(fns, t, update_meta(meta, t, 0), acc)
   end
 
   @doc ~S"""
@@ -127,10 +128,10 @@ defmodule Chrysopoeia.Parser.ParseTree.Walker do
   end
 
   # On decent the children become the siblings and the children are replaced.
-  defp update_meta(meta,  {e, _a, c}, i \\ 0) do
+  defp update_meta(meta, {e, a, c}, idx \\ 0) do
     c_len = length(c)
-    [ {:path, (meta[:path] || []) ++ [{e}] },
-      {:children, {Enum.map(c, fn({e, _a, _}) -> e; (_) -> "TEXT" end), i, c_len} },
+    [ {:path, (meta[:path] || []) ++ [{e, a}] },
+      {:children, {Enum.map(c, fn({e, _a, _}) -> e; (_) -> "TEXT" end), idx, c_len} },
       {:siblings, meta[:children] || {[], 0, 0} } ]
   end
 
