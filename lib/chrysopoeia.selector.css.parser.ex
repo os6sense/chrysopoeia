@@ -31,8 +31,7 @@ E:empty                 an E element that has no children (including text nodes)
 """
 defmodule Chrysopoeia.Selector.CSS.Parser do
 
-
-  @doc ~S"""
+  @doc """
     Given a string e.g. "div span p", create a selector function for matching
     against the meta. The function should be a list of functions which can
     be applied (right to left?) to match a nodes e, a and meta
@@ -40,38 +39,13 @@ defmodule Chrysopoeia.Selector.CSS.Parser do
   def create(str) do
     str
       |> split
-      |> compile
+      #    |> compile
   end
 
-  defp compile(map) when is_list(map) do
-    map
-      |> Enum.map( &(compile_selector(&1)) )
-  end
-
-  # takes a string which should be either a combinator function or a simple
-  # selector
-
-  #  "span" [{"id", "lvl_4_1"}] 
-  # -- META: [ path: [{"html"}, {"body"}, {"div"}, {"span"}, {"span"}, {"span"}, {"span"}], 
-  #            children: {["TEXT"], 0, 1}, 
-  #            siblings: {["TEXT", "br", "span", "span", "span", "span", "span", "span", "span"], 3, 9}]
-  # Combinators
-  defp compile_selector(str) when is_binary(str) do
-      #str == ">" -> fn (e, a, meta) -> fn(a, b) -> true end end
-      #str == "+" -> fn (e, a, meta) -> fn(a, b) -> true end end
-      #str == "~" -> fn (e, a, meta) -> fn(a, b) -> true end end
-  end
-
-  defp compile_selector(map) do
-    #cond do
-
-
-      ## Child?
-      #str.contains(":") -> fn (e, a, meta) ->  false end
-
-      ## it is an element selector?
-      #true ->fn (e, a, meta) -> e == str end
-    #end
+  def split(str) do
+    str 
+      |> String.split
+      |> Enum.map &_do_split(&1)
   end
 
   # Helper - make . and # syntax consistant
@@ -85,12 +59,6 @@ defmodule Chrysopoeia.Selector.CSS.Parser do
         "[id=#{String.lstrip(str, ?#)}]"
       true -> str
     end
-  end
-
-  def split(str) do
-    str 
-      |> String.split
-      |> Enum.map &_do_split(&1)
   end
   
   # Takes a selector string and returns matched groups. 

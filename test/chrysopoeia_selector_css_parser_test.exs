@@ -6,15 +6,15 @@ defmodule Chrysopoeia.Selector.CSS.Parser.Test do
   def assert_eq(left, right), do: assert left == right
   def assert_neq(left, right), do: assert left != right
 
-  alias Chrysopoeia.Selector.CSS.Parser, as: CSS
+  alias Chrysopoeia.Selector.CSS.Parser, as: Parser
 
   def single_split(str, attr \\ ["type", "attr", "op", "value"]) do
-    str |> CSS.split |> List.first |> Map.take(["type", "attr", "op", "value"]) 
+    str |> Parser.split |> List.first |> Map.take(["type", "attr", "op", "value"]) 
   end
 
   test "#split - single element" do
     "p" 
-      |> CSS.split 
+      |> Parser.split 
       |> List.first 
       |> Map.take(["type"]) 
       |> assert_eq %{"type" => "p"}
@@ -22,7 +22,7 @@ defmodule Chrysopoeia.Selector.CSS.Parser.Test do
 
   test "#split - single element with id" do
     "p[id]" 
-      |> CSS.split 
+      |> Parser.split 
       |> List.first 
       |> Map.take(["type", "attr"]) 
       |> assert_eq %{"attr" => "id", "type" => "p"}
@@ -90,7 +90,7 @@ defmodule Chrysopoeia.Selector.CSS.Parser.Test do
 
   test "#split - single element, pseudo type" do
     "p:first-child" 
-      |> CSS.split 
+      |> Parser.split 
       |> List.first 
       |> Map.take(["type", "ptype", "pval"]) 
       |> assert_eq %{"ptype" => "first-child", "pval" => "", "type" => "p"}
@@ -98,7 +98,7 @@ defmodule Chrysopoeia.Selector.CSS.Parser.Test do
 
   test "#split - single element, pseudo type with value" do
     "p:first-child(5)" 
-      |> CSS.split 
+      |> Parser.split 
       |> List.first 
       |> Map.take(["type", "ptype", "pval"]) 
       |> assert_eq %{"ptype" => "first-child", "pval" => "5", "type" => "p"}
@@ -106,14 +106,14 @@ defmodule Chrysopoeia.Selector.CSS.Parser.Test do
 
   test "#split - multiple elements" do
     "p b" 
-      |> CSS.split 
+      |> Parser.split 
       |> Enum.map(&Map.take(&1, ["type"])) 
       |> assert_eq [%{"type" => "p"}, %{"type" => "b"}]
   end
 
   test "#split - multiple elements, attributes and values" do
     "p[id=id_1] .inner b[class=bold]" 
-      |> CSS.split 
+      |> Parser.split 
       |> Enum.map(&Map.take(&1, ["type", "attr", "value"])) 
       |> assert_eq [%{"attr" => "id", "type" => "p", "value" => "id_1"},
                     %{"attr" => "class", "type" => "", "value" => "inner"},
@@ -122,7 +122,7 @@ defmodule Chrysopoeia.Selector.CSS.Parser.Test do
 
    test "#split - multiple . and #" do
     "#id_1 .inner .bold" 
-      |> CSS.split 
+      |> Parser.split 
       |> Enum.map(&Map.take(&1, ["type", "attr", "value"])) 
       |> assert_eq [%{"attr" => "id", "type" => "", "value" => "id_1"},
                     %{"attr" => "class", "type" => "", "value" => "inner"},
@@ -131,7 +131,7 @@ defmodule Chrysopoeia.Selector.CSS.Parser.Test do
 
   test "#split - multiple elements with comparitor" do
     "p > b" 
-      |> CSS.split 
+      |> Parser.split 
       |> assert_eq [%{"attr" => "", "op" => "", "ptype" => "", "pval" => "", "type" => "p", "value" => ""}, 
                     ">",
                     %{"attr" => "", "op" => "", "ptype" => "", "pval" => "", "type" => "b", "value" => ""}]
