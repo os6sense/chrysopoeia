@@ -24,7 +24,7 @@ defmodule Chrysopoeia.Parser.ParseTree.Test do
   test "Find - simple" do
     Sample.simple(:parse_tree)
       |> ParseTree.find("p")
-      |> assert_eq {Sample.simple(:parse_tree), [accumulator: [{"p", [], ["Test"]}, {"p", [{"class", "tc"}, {"id", "id_1"}], ["test 2"]}], index: 2]}
+      |> assert_eq {Sample.simple(:parse_tree), [accumulator: [{"p", [], ["Test"]}, {"p", [{"class", "tc"}, {"id", "id_1"}], ["test 2"]}], index: 0]}
   end
 
   test "to_html - simple" do

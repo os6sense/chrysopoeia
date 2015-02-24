@@ -5,7 +5,7 @@ defmodule Chrysopoeia.Selector.CSS.Compiler.Test do
   def assert_eq(left, right), do: assert left == right
   def assert_neq(left, right), do: assert left != right
 
-  alias Chrysopoeia.Selector.CSS.Parser, as: Parser
+  #alias Chrysopoeia.Selector.CSS.Parser, as: Parser
   alias Chrysopoeia.Selector.CSS.Compiler, as: Compiler
 
   # e.g. p
@@ -32,10 +32,10 @@ defmodule Chrysopoeia.Selector.CSS.Compiler.Test do
   # e.g. >
   @combinator ">"
 
-  test "combinator" do
-    Compiler.compile_selector(@combinator) 
-      |> assert_eq :combine
-  end
+  #test "combinator" do
+    #Compiler.compile_selector(@combinator) 
+      #|> assert_eq :combine
+  #end
 
   test "simple element" do
     fun = Compiler.compile_selector(@simple_element) 

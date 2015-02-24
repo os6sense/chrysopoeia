@@ -8,133 +8,145 @@ defmodule Chrysopoeia.Selector.CSS.Parser.Test do
 
   alias Chrysopoeia.Selector.CSS.Parser, as: Parser
 
-  def single_split(str, attr \\ ["type", "attr", "op", "value"]) do
-    str |> Parser.split |> List.first |> Map.take(["type", "attr", "op", "value"]) 
+  def create_single(str, attr \\ ["type", "attr", "op", "value"]) do
+    str |> Parser.create |> List.first |> Map.take(["type", "attr", "op", "value"]) 
   end
 
-  test "#split - single element" do
+  test "#create - single element" do
     "p" 
-      |> Parser.split 
+      |> Parser.create 
       |> List.first 
       |> Map.take(["type"]) 
       |> assert_eq %{"type" => "p"}
   end
 
-  test "#split - single element with id" do
+  test "#create - single element with id" do
     "p[id]" 
-      |> Parser.split 
+      |> Parser.create 
       |> List.first 
       |> Map.take(["type", "attr"]) 
       |> assert_eq %{"attr" => "id", "type" => "p"}
   end
 
-  test "#split - single element with id and value" do
+  test "#create - single element with id and value" do
     "p[id=val]" 
-      |> single_split 
+      |> create_single 
       |> assert_eq %{"attr" => "id", "op" => "=", "value" => "val", "type" => "p"}
   end
 
-  test "#split - attribute only with id and value" do
+  test "#create - attribute only with id and value" do
     "[id=val]"  
-      |> single_split 
+      |> create_single 
       |> assert_eq %{"attr" => "id", "op" => "=", "value" => "val", "type" => ""}
   end
 
-  test "#split - attribute only with id" do
+  test "#create - attribute only with id" do
     "[id]" 
-      |> single_split 
+      |> create_single 
       |> assert_eq %{"attr" => "id", "op" => "", "value" => "", "type" => ""}
   end
 
-  test "#split - attribute only with ~= comparitor" do
+  test "#create - attribute only with ~= comparitor" do
     "[id~=val]" 
-      |> single_split 
+      |> create_single 
       |> assert_eq %{"attr" => "id", "op" => "~=", "value" => "val", "type" => ""}
   end
 
-  test "#split - attribute only with $= comparitor" do
+  test "#create - attribute only with $= comparitor" do
     "[id$=val]" 
-      |> single_split 
+      |> create_single 
       |> assert_eq %{"attr" => "id", "op" => "$=", "value" => "val", "type" => ""}
   end
 
-  test "#split - attribute only with ^= comparitor" do
+  test "#create - attribute only with ^= comparitor" do
     "[id^=val]" 
-      |> single_split 
+      |> create_single 
       |> assert_eq %{"attr" => "id", "op" => "^=", "value" => "val", "type" => ""}
   end
 
-  test "#split - attribute only with *= comparitor" do
+  test "#create - attribute only with *= comparitor" do
     "[id*=val]" 
-      |> single_split 
+      |> create_single 
       |> assert_eq %{"attr" => "id", "op" => "*=", "value" => "val", "type" => ""}
   end
 
-  test "#split - attribute only with |= comparitor" do
+  test "#create - attribute only with |= comparitor" do
     "[id|=val]" 
-      |> single_split 
+      |> create_single 
       |> assert_eq %{"attr" => "id", "op" => "|=", "value" => "val", "type" => ""}
   end
 
-  test "#split - class selector" do
+  test "#create - class selector" do
     ".aclass"
-      |> single_split 
+      |> create_single 
       |> assert_eq %{"attr" => "class", "op" => "=", "value" => "aclass", "type" => ""}
   end
 
-  test "#split - id selector" do
+  test "#create - id selector" do
     "#myid" 
-      |> single_split 
+      |> create_single 
       |> assert_eq %{"attr" => "id", "op" => "=", "value" => "myid", "type" => ""}
   end
 
-  test "#split - single element, pseudo type" do
+  test "#create - single element, pseudo type" do
     "p:first-child" 
-      |> Parser.split 
+      |> Parser.create 
       |> List.first 
       |> Map.take(["type", "ptype", "pval"]) 
       |> assert_eq %{"ptype" => "first-child", "pval" => "", "type" => "p"}
   end
 
-  test "#split - single element, pseudo type with value" do
+  test "#create - single element, pseudo type with value" do
     "p:first-child(5)" 
-      |> Parser.split 
+      |> Parser.create 
       |> List.first 
       |> Map.take(["type", "ptype", "pval"]) 
       |> assert_eq %{"ptype" => "first-child", "pval" => "5", "type" => "p"}
   end
 
-  test "#split - multiple elements" do
+  test "#create - multiple elements" do
     "p b" 
-      |> Parser.split 
-      |> Enum.map(&Map.take(&1, ["type"])) 
-      |> assert_eq [%{"type" => "p"}, %{"type" => "b"}]
+      |> Parser.create 
+      |> assert_eq  [%{"attr" => "", "op" => "", "ptype" => "", "pval" => "", "type" => "p", "value" => ""}, 
+                     "!", 
+                     %{"attr" => "", "op" => "", "ptype" => "", "pval" => "", "type" => "b", "value" => ""}]
   end
 
-  test "#split - multiple elements, attributes and values" do
+  test "#create - multiple elements, attributes and values" do
     "p[id=id_1] .inner b[class=bold]" 
-      |> Parser.split 
-      |> Enum.map(&Map.take(&1, ["type", "attr", "value"])) 
-      |> assert_eq [%{"attr" => "id", "type" => "p", "value" => "id_1"},
-                    %{"attr" => "class", "type" => "", "value" => "inner"},
-                    %{"attr" => "class", "type" => "b", "value" => "bold"}]
+      |> Parser.create 
+      |> assert_eq [%{"attr" => "id", "type" => "p", "value" => "id_1", "op" => "=", "ptype" => "", "pval" => ""},
+                    "!",
+                    %{"attr" => "class", "type" => "", "value" => "inner", "op" => "=", "ptype" => "", "pval" => ""},
+                    "!",
+                    %{"attr" => "class", "type" => "b", "value" => "bold", "op" => "=", "ptype" => "", "pval" => ""}]
   end
 
-   test "#split - multiple . and #" do
+  test "#create - multiple . and #" do
     "#id_1 .inner .bold" 
-      |> Parser.split 
-      |> Enum.map(&Map.take(&1, ["type", "attr", "value"])) 
-      |> assert_eq [%{"attr" => "id", "type" => "", "value" => "id_1"},
-                    %{"attr" => "class", "type" => "", "value" => "inner"},
-                    %{"attr" => "class", "type" => "", "value" => "bold"}]
+      |> Parser.create 
+      |> assert_eq [%{"attr" => "id", "type" => "", "value" => "id_1", "op" => "=", "ptype" => "", "pval" => ""},
+                    "!",
+                    %{"attr" => "class", "type" => "", "value" => "inner", "op" => "=", "ptype" => "", "pval" => ""},
+                    "!",
+                    %{"attr" => "class", "type" => "", "value" => "bold", "op" => "=", "ptype" => "", "pval" => ""}]
   end
 
-  test "#split - multiple elements with comparitor" do
+  test "#create - multiple elements with comparitor" do
     "p > b" 
-      |> Parser.split 
+      |> Parser.create 
       |> assert_eq [%{"attr" => "", "op" => "", "ptype" => "", "pval" => "", "type" => "p", "value" => ""}, 
                     ">",
                     %{"attr" => "", "op" => "", "ptype" => "", "pval" => "", "type" => "b", "value" => ""}]
   end
 
+  test "create - adds a descendant operator" do
+    "p b > c" 
+      |> Parser.create
+      |> assert_eq [%{"attr" => "", "op" => "", "ptype" => "", "pval" => "", "type" => "p", "value" => ""}, 
+                    "!",
+                    %{"attr" => "", "op" => "", "ptype" => "", "pval" => "", "type" => "b", "value" => ""},
+                    ">",
+                    %{"attr" => "", "op" => "", "ptype" => "", "pval" => "", "type" => "c", "value" => ""}]
+  end
 end

@@ -2,6 +2,7 @@
 defmodule Chrysopoeia.Parser.ParseTree.Walker.Functions do
   require Logger
   require Chrysopoeia.Accumulator, as: Accumulator
+  require Chrysopoeia.Selector.CSS, as: CSS
 
   def function(:copy) do
       {:transform, fn
@@ -12,25 +13,25 @@ defmodule Chrysopoeia.Parser.ParseTree.Walker.Functions do
       }
   end
 
-  def function(:delete, name) do
+  def function(:delete, selector_fn) do
     {:delete, fn
-      (t = {e, _a, _c}, meta, acc) -> 
-         Logger.debug "delete: #{inspect e} -- #{inspect name}"
-         unless e == name, do: {t, acc}, else: {{:delete, [], []}, acc}
+      (t = {e, a, _c}, meta, acc) -> 
+         #Logger.debug "delete: #{inspect e} -- #{inspect name}"
+         unless CSS.match(e, a, meta, selector_fn), do: {t, acc}, else: {{:delete, [], []}, acc}
       end
     }
   end
 
-  def function(:find, name) do
+  def function(:find, selector_fn) do
       {:query, fn
-        (t = {e, _a, _c}, meta, acc) -> 
+        (t = {e, a, _c}, meta, acc) -> 
 
-          Logger.debug "find A: #{inspect t} -- #{inspect acc}"
+          #Logger.debug "find A: #{inspect t} -- #{inspect acc}"
 
-          if e == name, 
+          if CSS.match(e, a, meta, selector_fn),
             do: acc = Accumulator.update_accumulator(acc, t)
 
-          Logger.debug "find B: #{inspect t} -- #{inspect acc}"
+          #Logger.debug "find B: #{inspect t} -- #{inspect acc}"
           {t, acc}
         end
       }

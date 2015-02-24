@@ -4,18 +4,29 @@ defmodule Chrysopoeia.Parser.ParseTree do
 
   require Chrysopoeia.Parser.ParseTree.Walker, as: Walker
   require Chrysopoeia.Parser.ParseTree.Walker.Functions, as: Functions
+  alias Chrysopoeia.Selector.CSS, as: CSS
 
   def walk(t),      do: Walker.walk(t) |> elem(0)
   def walk(t, fns), do: Walker.walk(t, fns) |> elem(0)
 
-  def find(parse_tree, selector_fn) do
-    Walker.walk(parse_tree, [Functions.function(:find, selector_fn)])
+  def find(parse_tree, selector) when is_binary(selector) do
+    Walker.walk(parse_tree, [Functions.function(:find, CSS.create(selector) )])
   end
 
-  def delete(parse_tree, selector_fn) do
-    Walker.walk(parse_tree, [Functions.function(:delete, selector_fn)]) 
+  def find(parse_tree, selector) when is_list(selector) do
+    Walker.walk(parse_tree, [Functions.function(:find, selector)])
+  end
+
+  def delete(parse_tree, selector) when is_binary(selector) do
+    Walker.walk(parse_tree, [Functions.function(:delete, CSS.create(selector) )]) 
       |> elem(0)
   end
+
+  def delete(parse_tree, selector) when is_list(selector) do
+    Walker.walk(parse_tree, [Functions.function(:delete, selector )]) 
+      |> elem(0)
+  end
+
 
   # insert a text node
   #def insert(parse_tree, selector_fn, fragment) when is_binary(fragment) do

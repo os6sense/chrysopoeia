@@ -1,6 +1,4 @@
-
 """
-
 Below is the list of CSS selectors 
 
 .ident                  equivilent to *[class="ident"]
@@ -36,16 +34,17 @@ defmodule Chrysopoeia.Selector.CSS.Parser do
     against the meta. The function should be a list of functions which can
     be applied (right to left?) to match a nodes e, a and meta
   """
-  def create(str) do
-    str
-      |> split
-      #    |> compile
-  end
+  def create(str), do: str |> split |> introduce_descendant_op |> elem(0)
 
-  def split(str) do
-    str 
-      |> String.split
-      |> Enum.map &_do_split(&1)
+  # Adds a "!" op when there are two functions side by side
+  defp introduce_descendant_op(split_results) do
+    split_results
+      |> Enum.flat_map_reduce(nil, fn 
+        (e, nil) when is_map(e) -> {[e], e}
+        (e, nil) when is_binary(e) -> {[e], nil}
+        (e, acc) when is_map(e) and is_map(acc) -> {["!", e], e} 
+        (e, acc) when is_binary(e) and is_map(acc) -> {[e], nil} 
+      end)
   end
 
   # Helper - make . and # syntax consistant
@@ -62,7 +61,8 @@ defmodule Chrysopoeia.Selector.CSS.Parser do
   end
   
   # Takes a selector string and returns matched groups. 
-  #https://regex101.com/r/xW8tT1/2 - I feel dirty
+  # https://regex101.com/r/xW8tT1/2 - I feel dirty
+  defp split(str), do: str |> String.split |> Enum.map &_do_split(&1)
   defp _do_split(">"), do: ">"
   defp _do_split("+"), do: "+"
   defp _do_split("~"), do: "~"
