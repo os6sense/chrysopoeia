@@ -7,6 +7,7 @@
 
 defmodule Chrysopoeia.Selector.CSS.Compiler do
 
+  require Logger
   @doc """
     The map produced by the css parser has 6 fields of which only four
     will be regularly used. The css_map macro provides a short hand
@@ -46,7 +47,6 @@ defmodule Chrysopoeia.Selector.CSS.Compiler do
   # Takes the output of the CSS parser and compiles the map into functions for matching
   def compile(map) when is_list(map) do
     map
-      #|> Enum.map( &(compile_selector(&1)) )
       |> Enum.map_reduce(nil, fn 
            ("!", nil)  -> { nil, "!"}
            (">", nil)  -> { nil, ">"}
@@ -62,6 +62,7 @@ defmodule Chrysopoeia.Selector.CSS.Compiler do
       |> Enum.reject(fn (e) -> e == nil end)
   end
 
+  # ============================= CHILD  ==================================
   # E > F                   an F element child of an E element
   defmacro child(e, do: block) do
     quote do
@@ -75,7 +76,12 @@ defmodule Chrysopoeia.Selector.CSS.Compiler do
   def compile_child_selector( css_map(type, "", "", "") ) do
     child(e) do elem(e, 0) == type end
   end
+  # :attribute_only
+  def compile_child_selector( css_map("", attr, "", "") ) do
+  end
 
+
+  # ========================== DESCENDANT  ================================
   @doc """
     E F - an F element descendant of an E element
     return true if there is an element in the path matching the selector
@@ -88,24 +94,27 @@ defmodule Chrysopoeia.Selector.CSS.Compiler do
     end
   end
 
+  # element only
   def compile_descendant_selector( css_map(type, "", "", "") ) do
-    descendant(e) do elem(e, 0) == type end
+    Logger.debug("COMPILING DEC FN")
+    descendant(e) do Logger.debug("DEC FN element only e:#{inspect elem(e, 0)}, type:#{inspect type}"); elem(e, 0) == type end
   end
   # :attribute_only
   def compile_descendant_selector( css_map("", attr, "", "") ) do
-    descendant(e) do has_attribute?(elem(e, 1), attr) end
+    descendant(e) do Logger.debug("DEC FN"); has_attribute?(elem(e, 1), attr) end
   end
   # :attribute_value
   def compile_descendant_selector( css_map("", attr, op, value) ) do
-    descendant(e) do has_attribute_with_value?(elem(e, 1), attr, op, value) end
+    descendant(e) do Logger.debug("DEC FN"); has_attribute_with_value?(elem(e, 1), attr, op, value) end
   end
   # :element_attribute
   def compile_descendant_selector( css_map(type, attr, "", "") ) do
-    descendant(e) do elem(e, 0) == type && has_attribute?(elem(e, 1), attr) end
+    descendant(e) do Logger.debug("DEC FN"); elem(e, 0) == type && has_attribute?(elem(e, 1), attr) end
   end
   # :element_attribute_value
   def compile_descendant_selector( css_map(type, attr, op, value) ) do
     descendant(e) do 
+      Logger.debug("DEC FN")
       elem(e, 0) == type 
       && has_attribute_with_value?(elem(e, 1), attr, op, value) 
     end

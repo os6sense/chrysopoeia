@@ -128,9 +128,11 @@ defmodule Chrysopoeia.Parser.ParseTree.Walker do
   end
 
   # On decent the children become the siblings and the children are replaced.
+  # NB : Possible bug - is it being applied to immediate descendents e.g. head, body?
   defp update_meta(meta, {e, a, c}, idx \\ 0) do
     c_len = length(c)
-    [ {:path, (meta[:path] || []) ++ [{e, a}] },
+    #[ {:path, (meta[:path] || []) ++ [{e, a}] },
+    [ {:path, [{e, a}] ++ (meta[:path] || []) }, # reverse path for descendant/child search
       {:children, {Enum.map(c, fn({e, _a, _}) -> e; (_) -> "TEXT" end), idx, c_len} },
       {:siblings, meta[:children] || {[], 0, 0} } ]
   end

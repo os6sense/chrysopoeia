@@ -76,7 +76,7 @@ defmodule Chrysopoeia.Parser.Samples do
                 <span id="lvl2_3">lvl2 3</span>
               </span>
             </span>
-            <span id="lvl 1 last">lvl 1 last</span>
+            <span id="lvl_1_last">lvl_1_last</span>
           </div>
         </body>
       </html>
@@ -97,7 +97,7 @@ defmodule Chrysopoeia.Parser.Samples do
                        {"span", [{"id", "lvl_4_5"}], ["lvl4 5"]}, {"span", [{"id", "lvl_4_6"}], ["lvl4 6"]},
                        {"span", [{"id", "lvl_4_7"}],
                         ["lvl4 7", {"img", [{"src", "something.jpg"}, {"alt", "test"}], []}, {"a", [{"href", "somewhere.html"}], [{"img", [{"alt", "test"}, {"src", "something.jpg"}], []}, "sometext"]}]}]},
-                     {"span", [{"id", "lvl2_3"}], ["lvl2 3"]}]}]}, {"span", [{"id", "lvl 1 last"}], ["lvl 1 last"]}]}]}]}
+                     {"span", [{"id", "lvl2_3"}], ["lvl2 3"]}]}]}, {"span", [{"id", "lvl_1_last"}], ["lvl_1_last"]}]}]}]}
   end
 
 

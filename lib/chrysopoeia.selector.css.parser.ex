@@ -33,8 +33,11 @@ defmodule Chrysopoeia.Selector.CSS.Parser do
     Given a string e.g. "div span p", create a selector function for matching
     against the meta. The function should be a list of functions which can
     be applied (right to left?) to match a nodes e, a and meta
+
+    Note: added reverse in, not sure if it will work as I expect
   """
-  def create(str), do: str |> split |> introduce_descendant_op |> elem(0)
+  def create(str), 
+    do: str |> split |> introduce_descendant_op |> elem(0) |> Enum.reverse
 
   # Adds a "!" op when there are two functions side by side
   defp introduce_descendant_op(split_results) do

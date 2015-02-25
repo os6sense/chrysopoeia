@@ -107,46 +107,58 @@ defmodule Chrysopoeia.Selector.CSS.Parser.Test do
   test "#create - multiple elements" do
     "p b" 
       |> Parser.create 
-      |> assert_eq  [%{"attr" => "", "op" => "", "ptype" => "", "pval" => "", "type" => "p", "value" => ""}, 
+      |> assert_eq  [%{"attr" => "", "op" => "", "ptype" => "", "pval" => "", "type" => "b", "value" => ""}, 
                      "!", 
-                     %{"attr" => "", "op" => "", "ptype" => "", "pval" => "", "type" => "b", "value" => ""}]
+                     %{"attr" => "", "op" => "", "ptype" => "", "pval" => "", "type" => "p", "value" => ""}]
   end
 
   test "#create - multiple elements, attributes and values" do
     "p[id=id_1] .inner b[class=bold]" 
       |> Parser.create 
-      |> assert_eq [%{"attr" => "id", "type" => "p", "value" => "id_1", "op" => "=", "ptype" => "", "pval" => ""},
+      |> assert_eq [%{"attr" => "class", "type" => "b", "value" => "bold", "op" => "=", "ptype" => "", "pval" => ""},
                     "!",
                     %{"attr" => "class", "type" => "", "value" => "inner", "op" => "=", "ptype" => "", "pval" => ""},
                     "!",
-                    %{"attr" => "class", "type" => "b", "value" => "bold", "op" => "=", "ptype" => "", "pval" => ""}]
+                    %{"attr" => "id", "type" => "p", "value" => "id_1", "op" => "=", "ptype" => "", "pval" => ""}]
+                    
   end
 
   test "#create - multiple . and #" do
     "#id_1 .inner .bold" 
       |> Parser.create 
-      |> assert_eq [%{"attr" => "id", "type" => "", "value" => "id_1", "op" => "=", "ptype" => "", "pval" => ""},
+      |> assert_eq [%{"attr" => "class", "type" => "", "value" => "bold", "op" => "=", "ptype" => "", "pval" => ""},
                     "!",
                     %{"attr" => "class", "type" => "", "value" => "inner", "op" => "=", "ptype" => "", "pval" => ""},
                     "!",
-                    %{"attr" => "class", "type" => "", "value" => "bold", "op" => "=", "ptype" => "", "pval" => ""}]
+                    %{"attr" => "id", "type" => "", "value" => "id_1", "op" => "=", "ptype" => "", "pval" => ""}]
+                    
   end
 
   test "#create - multiple elements with comparitor" do
     "p > b" 
       |> Parser.create 
-      |> assert_eq [%{"attr" => "", "op" => "", "ptype" => "", "pval" => "", "type" => "p", "value" => ""}, 
+      |> assert_eq [%{"attr" => "", "op" => "", "ptype" => "", "pval" => "", "type" => "b", "value" => ""},
                     ">",
-                    %{"attr" => "", "op" => "", "ptype" => "", "pval" => "", "type" => "b", "value" => ""}]
+                    %{"attr" => "", "op" => "", "ptype" => "", "pval" => "", "type" => "p", "value" => ""}]
   end
 
   test "create - adds a descendant operator" do
+    IO.puts "p b > c"
     "p b > c" 
       |> Parser.create
-      |> assert_eq [%{"attr" => "", "op" => "", "ptype" => "", "pval" => "", "type" => "p", "value" => ""}, 
-                    "!",
-                    %{"attr" => "", "op" => "", "ptype" => "", "pval" => "", "type" => "b", "value" => ""},
+      |> assert_eq [%{"attr" => "", "op" => "", "ptype" => "", "pval" => "", "type" => "c", "value" => ""}, 
                     ">",
-                    %{"attr" => "", "op" => "", "ptype" => "", "pval" => "", "type" => "c", "value" => ""}]
+                    %{"attr" => "", "op" => "", "ptype" => "", "pval" => "", "type" => "b", "value" => ""},
+                    "!",
+                    %{"attr" => "", "op" => "", "ptype" => "", "pval" => "", "type" => "p", "value" => ""}]
+  end
+
+  test "create - complex - makes sense" do
+    "span > p > b + em"
+      |> Parser.create
+      |> assert_eq [%{"attr" => "", "op" => "", "ptype" => "", "pval" => "", "type" => "em", "value" => ""}, "+", 
+                    %{"attr" => "", "op" => "", "ptype" => "", "pval" => "", "type" => "b", "value" => ""}, ">",
+                    %{"attr" => "", "op" => "", "ptype" => "", "pval" => "", "type" => "p", "value" => ""}, ">", 
+                    %{"attr" => "", "op" => "", "ptype" => "", "pval" => "", "type" => "span", "value" => ""}]
   end
 end
