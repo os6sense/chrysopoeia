@@ -143,7 +143,6 @@ defmodule Chrysopoeia.Selector.CSS.Parser.Test do
   end
 
   test "create - adds a descendant operator" do
-    IO.puts "p b > c"
     "p b > c" 
       |> Parser.create
       |> assert_eq [%{"attr" => "", "op" => "", "ptype" => "", "pval" => "", "type" => "c", "value" => ""}, 
