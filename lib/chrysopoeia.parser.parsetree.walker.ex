@@ -1,12 +1,5 @@
 defmodule Chrysopoeia.Parser.ParseTree.Walker do
-  # TODO : NEXT, pass in parent path as [{tag, attr}, {tag, attr}]
-  # DONE
 
-  # TODO NEXT: do I need to include sibling tags?
-
-  # TODO: Function application: In order to apply functions in a single pass
-  #       these need to be tagged and ordered, hence I should probably be 
-  #       defining the function as a tuple e.g. {:delete, fn ..body..}
 
   #TODO:  path in walk needs more info for css matches. The question is what
   #       and how much. To support:
@@ -63,9 +56,16 @@ defmodule Chrysopoeia.Parser.ParseTree.Walker do
   """
   @spec walk(Tuple, List) :: Tuple
   def walk(pt, fns \\ [Functions.function(:copy)]) when is_tuple(pt) do
-    Logger.debug "---------------- NEW WALK ------------------"
+    #Logger.debug "------------------------------------------------------------"
+    #Logger.debug "------------------------ NEW WALK --------------------------"
+    #Logger.debug "------------------------------------------------------------"
     _walk(pt, Functions.order(fns), Accumulator.create , [])
   end
+
+
+
+
+
 
   @doc ~S""" 
     matches a text node. 
@@ -75,7 +75,15 @@ defmodule Chrysopoeia.Parser.ParseTree.Walker do
     #Logger.debug "TEXT NODE 2 META: #{inspect meta}"
     {String.strip(text), acc}
   end
-    
+
+  # matches a comment
+  def _walk(t = { :comment, text}, fns, acc, meta) when is_binary(text) do
+    # Logger.debug "COMMENT"
+    {text, acc}
+  end
+
+
+
   # matches a text node with children
   def _walk(t = { _, _, [c]}, fns, acc, meta) when is_binary(c) do
     #Logger.debug "TEXT NODE 3 - #{inspect t} -- META: #{inspect meta}"
@@ -90,6 +98,7 @@ defmodule Chrysopoeia.Parser.ParseTree.Walker do
     #Logger.debug "LW A - #{inspect e} -- #{inspect acc}"
     #Logger.debug "LW META: #{inspect meta}" 
    
+    meta = update_meta(meta, t)
     {{e, a, c}, acc} = apply_functions(fns, t, meta, acc)
 
     #Logger.debug "LW B - #{inspect e} -- acc: #{inspect acc}"
@@ -98,7 +107,11 @@ defmodule Chrysopoeia.Parser.ParseTree.Walker do
     unless e == :delete do
       {children, {acc, idx}} = Enum.map_reduce(c, {acc, 1}, fn
         (child, {lacc, idx}) -> 
+          
+          #Logger.debug "LW C - #{inspect e} -- acc: #{inspect acc}"
+          #Logger.debug "LW META: #{inspect meta}" 
           meta = update_meta(meta, {e, a, c}, idx)
+
           {r_tree, r_acc} = _walk(child, fns, lacc, meta)
           {r_tree, {r_acc, idx + 1}}
       end)
@@ -131,9 +144,12 @@ defmodule Chrysopoeia.Parser.ParseTree.Walker do
   # NB : Possible bug - is it being applied to immediate descendents e.g. head, body?
   defp update_meta(meta, {e, a, c}, idx \\ 0) do
     c_len = length(c)
-    [ {:path, [{e, a}] ++ (meta[:path] || []) }, # reverse path for descendant/child search
+    #Logger.debug "UPDATE META PRE: #{inspect meta}"
+    meta = [ {:path, [{e, a}] ++ (meta[:path] || []) }, # reverse path for descendant/child search
       {:children, {Enum.map(c, fn({e, a, _}) -> {e, a}; (_) -> "TEXT" end), idx, c_len} },
       {:siblings, meta[:children] || {[], 0, 0} } ]
+    #Logger.debug "UPDATE META POST: #{inspect meta}"
+    meta
   end
 
   # Apply the fncs to the node 

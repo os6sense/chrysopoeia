@@ -7,7 +7,7 @@ defmodule Chrysopoeia.Parser.ParseTree.Walker.Functions do
   def function(:copy) do
       {:transform, fn
           (t = {e, a, c}, meta, acc) -> 
-            Logger.debug "COPY: #{inspect e} #{inspect a} -- META: #{inspect meta}"
+            #Logger.debug "COPY: #{inspect e} #{inspect a} -- META: #{inspect meta}"
             {t, acc}
           end
       }

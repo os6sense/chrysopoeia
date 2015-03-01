@@ -1,0 +1,6 @@
+duration:1.0;mem stats:false;sys mem stats:false
+module;test;tags;iterations;elapsed
+Chrysopoeia.Walker.Benchmarks;Walker Walk - wikipedia;;100;1949950
+Chrysopoeia.CSS.Benchmarks;CSS find - wikipedia;;100;2141162
+Chrysopoeia.Walker.Benchmarks;Walker Walk+to_html - wikipedia;;50;1765504
+Chrysopoeia.Walker.Benchmarks;Walker - parse only, wikipedia;;100;1147688

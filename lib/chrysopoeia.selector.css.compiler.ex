@@ -3,7 +3,7 @@
 # DONE E F        an F element descendant of an E element
 # DONE  E > F     an F element child of an E element
 # DONE E + F      an F element immediately preceded by an E element
-# E ~ F           an F element preceded by an E element
+# DONE E ~ F           an F element preceded by an E element
 
 defmodule Chrysopoeia.Selector.CSS.Compiler do
 
@@ -22,7 +22,7 @@ defmodule Chrysopoeia.Selector.CSS.Compiler do
            (e, "!")    -> { compile_descendant_selector(e), nil}
            (e, ">")    -> { compile_child_selector(e), nil}
            (e, "+")    -> { compile_ipreceding_selector(e), nil}
-           #(e, "~")    -> { compile_preceding_selector(e), nil}
+           (e, "~")    -> { compile_preceding_selector(e), nil}
            (e, nil)    -> { compile_selector(e), nil}
       end)
       |> elem(0)
@@ -33,7 +33,7 @@ defmodule Chrysopoeia.Selector.CSS.Compiler do
   def compile_child_selector(map), do: _compile_child_selector(map)
   def compile_selector( map ), do: _compile_selector(map)
   def compile_ipreceding_selector(map), do: _compile_ipreceding_selector(map)
-  #def compile_preceding_selector(map), do: _compile_preceding_selector(map)
+  def compile_preceding_selector(map), do: _compile_preceding_selector(map)
 
   # =========== PRIVATE
 
@@ -56,12 +56,42 @@ defmodule Chrysopoeia.Selector.CSS.Compiler do
 
   defp adjust_sibling_meta(meta, idx, false), do: meta
   defp adjust_sibling_meta(meta, idx, true) do
-    IO.puts "#{inspect meta}"
+    #Logger.debug "#{inspect meta}"
     Keyword.update(meta, :siblings, {[], 0, 0}, &(_do_sibling_delete(&1, idx) ))
   end
   defp _do_sibling_delete({siblings, current, total}, idx) do
     {List.delete_at(siblings, idx), current - 1, total - 1}
   end
+
+
+  # TODO: There is a lot of repetition amongst these functions - so much so 
+  # that they probably can be condensed into a single macro/function. A 
+  # massive refactor is on the cards.
+  # =======================================================================
+  # ============================ PRECEEDING ===============================
+  # =======================================================================
+  # E ~ F           an F element preceded by an E element
+  defp _compile_preceding_selector( cssmap_t(type) ) do
+    preceding(e) do elem(e, 0) == type end
+  end
+  defp _compile_preceding_selector( cssmap_a(attr) ) do
+    preceding(e) do has_attribute?(elem(e, 1), attr) end
+  end
+  defp _compile_preceding_selector( cssmap(attr, op, value) ) do
+    preceding(e) do has_attribute_with_value?(elem(e, 1), attr, op, value) end
+  end
+  # :element_attribute
+  defp _compile_preceding_selector( cssmap(type, attr) ) do
+    preceding(e) do elem(e, 0) == type && has_attribute?(elem(e, 1), attr) end
+  end
+  # :element_attribute_value
+  defp _compile_preceding_selector( css_map(type, attr, op, value) ) do
+    preceding(e) do 
+      elem(e, 0) == type 
+      && has_attribute_with_value?(elem(e, 1), attr, op, value) 
+    end
+  end
+
 
 
   # =======================================================================

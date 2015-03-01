@@ -1,8 +1,6 @@
 defmodule Chrysopoeia.Parser.Benchmarks do
   use Benchfella
 
-  # alias Chrysopoeia.Parser
-
   defp load__wikipedia_html() do
     {_, content} = File.read("./test/html_test_samples/parsing_wikipedia.html")
     content

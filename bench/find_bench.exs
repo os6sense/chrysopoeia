@@ -1,10 +1,22 @@
-defmodule BasicBench do
+defmodule Chrysopoeia.CSS.Benchmarks do
   use Benchfella
+  
+  alias Chrysopoeia.Parser.ParseTree, as: ParseTree
+  defp load_wikipedia_html() do
+    {_, content} = File.read("./test/html_test_samples/parsing_wikipedia.html")
 
-  #bench "" do
-     #Toys.EV.get_token5("dog=cat&token=cow&frog=false&bog=true", "frog")
-  #end
-  #bench "split s" do
-     #Toys.get_token_s("dog=cat&token=cow&frog=false&bog=true", "frog")
-  #end
+    content |> Chrysopoeia.Parser.Floki.parse
+  end
+
+  bench "CSS find - wikipedia", [parse_tree: load_wikipedia_html()] do
+    result = parse_tree
+      |> ParseTree.find("h3 + p")
+      #|> ParseTree.find("[id=Psycholinguistics]")
+      |> elem(1)
+
+    #IO.puts "-----------------------------"
+    #IO.inspect result
+    #IO.puts "-----------------------------"
+  end
+
 end

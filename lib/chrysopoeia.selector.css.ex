@@ -29,10 +29,16 @@ defmodule Chrysopoeia.Selector.CSS do
   # each mfn is a css matching function - note that the order of functions is reversed
   # by the css parser - does that work?
   def match(e, a, meta, selector_fns) do
-    Logger.debug "------------------ NEW CSS MATCH ---------------------"
+    #Logger.debug "------------------------------------------------------"
+    #Logger.debug "------------------ NEW CSS MATCH ---------------------"
+    #Logger.debug "------------------------------------------------------"
+    #Logger.debug "E: #{inspect e}  A: #{inspect a}"
+    #Logger.debug "META:#{inspect meta}"
+    #Logger.debug "------------------------------------------------------"
+    
     Enum.reduce(selector_fns, {true, meta}, fn 
       (func, {all_true?, adjusted_meta}) ->
-        Logger.debug "#e:#{inspect e} a:#{inspect a} meta: #{inspect adjusted_meta}"
+        #Logger.debug "#e:#{inspect e} a:#{inspect a} meta: #{inspect adjusted_meta}"
         if all_true? do
           func.(e, a, adjusted_meta)
         else

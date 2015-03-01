@@ -1,0 +1,3 @@
+duration:1.0;mem stats:false;sys mem stats:false
+module;test;tags;iterations;elapsed
+Chrysopoeia.Walker.Benchmarks;Walker Walk - wikipedia;;100;1947845

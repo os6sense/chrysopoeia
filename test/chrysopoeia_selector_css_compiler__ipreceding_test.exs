@@ -1,4 +1,4 @@
-defmodule Chrysopoeia.Selector.CSS.Compiler__iprededing.Test do
+defmodule Chrysopoeia.Selector.CSS.Compiler__ipreceding.Test do
   use ExUnit.Case
 
   def assert_eq(left, right), do: assert left == right
@@ -6,7 +6,7 @@ defmodule Chrysopoeia.Selector.CSS.Compiler__iprededing.Test do
 
   alias Chrysopoeia.Selector.CSS.Compiler, as: Compiler
 
-  # e.g. div > p
+  # e.g. div + p
   @simple_element %{"type" => "div", "attr" => "", "op" => "", "value" => "", "ptype" => "", "pval" => "" }
 
   # e.g. p[id]
@@ -21,28 +21,34 @@ defmodule Chrysopoeia.Selector.CSS.Compiler__iprededing.Test do
   # e.g. [id]
   @attribute_only %{"type" => "", "attr" => "id", "op" => "", "value" => "", "ptype" => "", "pval" => "" }
 
-  test "simple element preceding - should match" do
+  test "preceeding element is matched" do
     fun = Compiler.compile_ipreceding_selector(@simple_element) 
-    fun.("p", [], [{:siblings, {[{"div", []} ], 1, 1 }}])
+    fun.("p", [], [{:siblings, {[{"div", []}, {"p", []} ], 2, 2 }}])
       |> elem(0) |> assert_eq true
+  end
 
-    fun.("p", [], [{:siblings, {[{"div", []}, {"span", []}], 1, 2 }}])
-      |> elem(0) |> assert_eq true
+  test "matching of the first element doesnt crash" do
+    fun = Compiler.compile_ipreceding_selector(@simple_element) 
+    fun.("p", [], [{:siblings, {[{"div", []}, {"p", []}], 1, 2 }}])
+      |> elem(0) |> assert_eq false
+  end
 
+  test "simple element immediately preceding - should match" do
+    fun = Compiler.compile_ipreceding_selector(@simple_element) 
     fun.("p", [], [{:siblings, {[{"p", []}, {"span", []}, {"div", []} ], 3, 3 }}])
       |> elem(0) |> assert_eq true
   end
 
-  test "simple element preceding - should not match" do
+  test "simple element immediately preceding - should not match" do
     fun = Compiler.compile_ipreceding_selector(@simple_element) 
-    fun.("p", [], [{:siblings, {[{"p", []}, {"div", []}, {"span", []}], 3, 3 }}])
+    fun.("p", [], [{:siblings, {[{"p", []}, {"div", []}, {"p", []}], 2, 3 }}])
       |> elem(0) |> assert_eq false
 
-    fun.("p", [], [{:siblings, {[{"div", []}, {"span", []}], 2, 2 }}])
+    fun.("p", [], [{:siblings, {[{"div", []}, {"p", []}, {"p", []}], 3, 3 }}])
       |> elem(0) |> assert_eq false
   end
 
-  test "attribute only preceeding - should match" do
+  test "attribute only immediately preceeding - should match" do
     fun = Compiler.compile_ipreceding_selector(@attribute_only)
     fun.("p", [], [{:siblings, {[{"p", [{"id", "jjk1"} ]}, {"div", []}, {"span", []}], 1, 3 }}])
       |> elem(0) |> assert_eq true
@@ -51,37 +57,9 @@ defmodule Chrysopoeia.Selector.CSS.Compiler__iprededing.Test do
       |> elem(0) |> assert_eq true
   end
 
-  test "attribute only preceeding - should fail" do
+  test "attribute only immediately preceeding - should fail" do
     fun = Compiler.compile_ipreceding_selector(@attribute_only)
     fun.("p", [], [{:siblings, {[{"p", [{"id", "1"} ]}, {"div", []}, {"span", []}], 2, 3 }}])
       |> elem(0) |> assert_eq false
   end
-
-  #test "attribute value" do
-    #fun = Compiler.compile_child_selector(@attribute_value)
-    #fun.("p", [], [{:path, [{"div", [{"id", "lvl_1"}]}] }])
-      #|> elem(0) |> assert_eq true
-
-    #fun.("p", [], [{:path, [{"div", []}, {"span", [{"id", "lvl_1"}]}] }])
-      #|> elem(0) |> assert_eq false
-
-    #fun.("p", [], [{:path, [{"div", [{"id", "lvl_2"}]}]}])
-      #|> elem(0) |> assert_eq false
-  #end
-  
-  #test "element attribute " do
-    #fun = Compiler.compile_child_selector(@simple_element_attribute)
-    #fun.("p", [], [{:path, [{"p", [{"id", "lvl_1"}]}] }])
-      #|> elem(0) |> assert_eq true
-
-    #fun.("p", [], [{:path, [{"p", []}, {"p", [{"id", "lvl_1"}]}] }])
-      #|> elem(0) |> assert_eq false
-
-    #fun.("p", [], [{:path, [{"p", []}, {"span", [{"id", "lvl_1"}]}] }])
-      #|> elem(0) |> assert_eq false
-
-    #fun.("p", [], [{:path, [{"div", [{"id", "lvl_2"}]}]}])
-      #|> elem(0) |> assert_eq false
-  #end
-
 end

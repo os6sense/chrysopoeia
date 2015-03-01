@@ -28,5 +28,8 @@ defmodule Chrysopoeia.Parser.ParseTree.Walker.Test do
   test "Deep Nesting Walk", 
     do: assert_walk_does_not_change Sample.deep_nesting(:parse_tree)
 
+  test "Meta is set correctly" do
+  end
+
 end
 
