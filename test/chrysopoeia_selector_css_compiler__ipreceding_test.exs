@@ -33,9 +33,9 @@ defmodule Chrysopoeia.Selector.CSS.Compiler__ipreceding.Test do
       |> elem(0) |> assert_eq false
   end
 
-  test "simple element immediately preceding - should match" do
+  test "simple element immediately preceding - at end should match" do
     fun = Compiler.compile_ipreceding_selector(@simple_element) 
-    fun.("p", [], [{:siblings, {[{"p", []}, {"span", []}, {"div", []} ], 3, 3 }}])
+    fun.("p", [], [{:siblings, {[{"p", []}, {"div", []}, {"p", []} ], 3, 3 }}])
       |> elem(0) |> assert_eq true
   end
 
@@ -43,23 +43,29 @@ defmodule Chrysopoeia.Selector.CSS.Compiler__ipreceding.Test do
     fun = Compiler.compile_ipreceding_selector(@simple_element) 
     fun.("p", [], [{:siblings, {[{"p", []}, {"div", []}, {"p", []}], 2, 3 }}])
       |> elem(0) |> assert_eq false
+  end
 
+  test "simple element immediately preceding - should not match" do
+    fun = Compiler.compile_ipreceding_selector(@simple_element) 
     fun.("p", [], [{:siblings, {[{"div", []}, {"p", []}, {"p", []}], 3, 3 }}])
       |> elem(0) |> assert_eq false
   end
 
-  test "attribute only immediately preceeding - should match" do
+  test "attribute only immediately preceeding at start - should match" do
     fun = Compiler.compile_ipreceding_selector(@attribute_only)
-    fun.("p", [], [{:siblings, {[{"p", [{"id", "jjk1"} ]}, {"div", []}, {"span", []}], 1, 3 }}])
+    fun.("div", [], [{:siblings, {[{"p", [{"id", "jjk1"} ]}, {"div", []}, {"span", []}], 2, 3 }}])
       |> elem(0) |> assert_eq true
+  end
 
-    fun.("p", [], [{:siblings, {[{"p", []}, {"div", []}, {"span", [{"id", "jjk1"}  ]}], 3, 3 }}])
+  test "attribute only immediately preceeding at end - should match" do
+    fun = Compiler.compile_ipreceding_selector(@attribute_only)
+    fun.("p", [], [{:siblings, {[{"p", []}, {"span", [{"id", "jjk1"}]}, {"p", []}], 3, 3 }}])
       |> elem(0) |> assert_eq true
   end
 
   test "attribute only immediately preceeding - should fail" do
     fun = Compiler.compile_ipreceding_selector(@attribute_only)
-    fun.("p", [], [{:siblings, {[{"p", [{"id", "1"} ]}, {"div", []}, {"span", []}], 2, 3 }}])
+    fun.("p", [], [{:siblings, {[{"p", [{"id", "1"} ]}, {"div", []}, {"span", []}], 3, 3 }}])
       |> elem(0) |> assert_eq false
   end
 end

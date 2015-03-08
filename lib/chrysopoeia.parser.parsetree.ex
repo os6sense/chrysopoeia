@@ -27,7 +27,6 @@ defmodule Chrysopoeia.Parser.ParseTree do
       |> elem(0)
   end
 
-
   # insert a text node
   #def insert(parse_tree, selector_fn, fragment) when is_binary(fragment) do
     ## convert text fragment to parse_tree

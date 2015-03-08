@@ -33,6 +33,7 @@ defmodule Chrysopoeia.Mixfile do
      {:exmerl, "~> 0.1.1"},
      {:eml, "~> 0.7.1"},
      {:zipper_tree, "~>0.1.1"},
+     {:exprof, "~>0.2.0"},
     ]
   end
 end

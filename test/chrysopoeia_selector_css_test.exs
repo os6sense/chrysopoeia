@@ -142,15 +142,10 @@ defmodule Chrysopoeia.Selector.CSS.Test do
       |> assert_eq [{"span", [{"id", "lvl_4_7"}], ["lvl4 7", {"img", [{"src", "something.jpg"}, {"alt", "test"}], []}, {"a", [{"href", "somewhere.html"}], [{"img", [{"alt", "test"}, {"src", "something.jpg"}], []}, "sometext"]}]}]
   end
 
-  # Need to ensure testing right to left?
   test "preceding selector - div and 3 ~ at the end" do
       CSS.create("div #lvl_4_5 ~ span ~ #lvl_4_7") 
       |> test_child
       |> assert_eq [{"span", [{"id", "lvl_4_7"}], ["lvl4 7", {"img", [{"src", "something.jpg"}, {"alt", "test"}], []}, {"a", [{"href", "somewhere.html"}], [{"img", [{"alt", "test"}, {"src", "something.jpg"}], []}, "sometext"]}]}]
   end
-
-
-
-
 
 end

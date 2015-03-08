@@ -145,6 +145,7 @@ defmodule Chrysopoeia.Selector.CSS.Compiler.Macros do
     end
   end
 
+  # TODO: I'm still not happy with this...
   defmacro cssmap_t(type) do
     quote do css_map(unquote(type), "", "", "") end
   end

@@ -1,5 +1,7 @@
 %{"eml": {:hex, :eml, "0.7.1"},
   "exmerl": {:hex, :exmerl, "0.1.1"},
+  "exprintf": {:hex, :exprintf, "0.1.6"},
+  "exprof": {:hex, :exprof, "0.2.0"},
   "floki": {:hex, :floki, "0.0.5"},
   "httpotion": {:hex, :httpotion, "2.0.0"},
   "ibrowse": {:git, "git://github.com/cmullaparthi/ibrowse.git", "d2e369ff42666c3574b8b7ec26f69027895c4d94", [tag: "v4.1.1"]},

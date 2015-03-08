@@ -1,0 +1,75 @@
+<!-- 
+    Everything between here and the folowing end tag will be 
+     discarded when the transform is run. This is the designer part
+     of the content where the designer can basically just treat the 
+     page as html without worrying about the layout etc.
+-->
+<html>
+<head>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+  <title>This should also be replaced</title>
+</head>
+<body>
+  <div class="bs-docs-header">
+    <div class="container">
+      <h1>Getting started</h1>
+      <p>This is the layout page.</p>
+    </div>
+  </div>
+  <div class="container">
+    <div id="header">
+      This is the top of the page.
+    </div>
+<!-- End of "discarded" html -->
+ 
+<!-- the following div, with the content id, is what will be extracted 
+     and included into the layout -->
+    <div id="content">
+<h1 id="action_title">The word "Editing" or "Creating" should be introduced before this</h1>
+
+<div class="errors" id="form_errors">
+Any errors with submitting the post will appear here, if there are no errors
+it will be deleted.
+</div>
+
+<form>
+  <input type="hidden" id="post_id" value=""/>
+  <div class="form-group">
+    <label for="post_title">Post Title</label>
+    <input type="text" class="form-control" id="post_title" placeholder="Provide a title" value="">
+  </div>
+  <div class="form-group">
+    <label for="post_date">Post Date</label>
+    <input type="text" class="form-control" id="post_date" placeholder="We'll do a nice date control soon" value="">
+  </div>
+  <div class="form-group">
+    <label for="post_tags">Post Tags</label>
+    <input type="text" class="form-control" id="post_tags" placeholder="Provide some tags" value="">
+  </div>
+  <div class="form-group">
+    <label for="post_body">Contents</label>
+    <textarea class="form-control" id="post_body" rows="8">This is the content of the text area.</textarea>
+  </div>
+  <div class="checkbox">
+    <label>
+      <input type="checkbox" id="post_visible" value="">
+      Visible to public?
+    </label>
+  </div>
+
+  <input class="btn btn-default" type="submit" value="Submit" id="submit">
+</form>
+
+    </div>
+
+<!-- again, everything onwards will be discarded -->
+
+    <div id="footer">
+      THIS is the bottom of the page.
+    </div>
+  </div>
+
+</body>
+</html>

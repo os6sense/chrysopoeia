@@ -1,0 +1,5 @@
+duration:1.0;mem stats:false;sys mem stats:false
+module;test;tags;iterations;elapsed
+Chrysopoeia.CSS.Benchmarks;CSS find single element by id - wikipedia;;200;1715657
+Chrysopoeia.CSS.Benchmarks;CSS find preceeding operatior - wikipedia;;200;1758578
+Chrysopoeia.CSS.Benchmarks;CSS find preceeding operatior, compiled selector - wikipedia;;200;1741013

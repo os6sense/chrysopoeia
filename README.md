@@ -30,7 +30,6 @@ urlreader
 filereader
 reader - get the document from a file or a url
 
-
 tokenizer - tokenize a html document 
 parser
 

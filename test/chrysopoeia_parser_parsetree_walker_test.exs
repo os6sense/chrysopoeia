@@ -1,7 +1,6 @@
 
 defmodule Chrysopoeia.Parser.ParseTree.Walker.Test do
   use ExUnit.Case
-
   import SaneAsserts
 
   alias Chrysopoeia.Parser.ParseTree.Walker, as: Walker
@@ -29,6 +28,7 @@ defmodule Chrysopoeia.Parser.ParseTree.Walker.Test do
     do: assert_walk_does_not_change Sample.deep_nesting(:parse_tree)
 
   test "Meta is set correctly" do
+
   end
 
 end

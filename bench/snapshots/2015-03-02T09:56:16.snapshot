@@ -1,0 +1,17 @@
+duration:1.0;mem stats:false;sys mem stats:false
+module;test;tags;iterations;elapsed
+Chrysopoeia.CSS.Benchmarks;CSS find single element by id - wikipedia;;200;1777081
+Chrysopoeia.Parser.Benchmarks;Yaws Parse - wikipedia;;500;2262718
+Chrysopoeia.Walker.Benchmarks;Walker Walk - wikipedia;;100;1953594
+Chrysopoeia.Parser.Benchmarks;Floki Parse - simple;;100000;1045399
+Chrysopoeia.Parser.Benchmarks;Trane Parse - wikipedia;;50;2136076
+Chrysopoeia.Parser.Benchmarks;Floki Parse - wikipedia;;100;1184611
+Chrysopoeia.Parser.Benchmarks;Eml Parse - simple;;50000;3586296
+Chrysopoeia.CSS.Benchmarks;CSS find preceeding operatior - wikipedia;;200;1785633
+Chrysopoeia.Parser.Benchmarks;Yaws Parse - simple;;500000;2598887
+Chrysopoeia.CSS.Benchmarks;CSS find preceeding operatior, compiled selector - wikipedia;;200;1755588
+Chrysopoeia.Parser.Benchmarks;Exmerl Parse - simple;;50000;3124955
+Chrysopoeia.Parser.Benchmarks;Trane Parse - simple;;100000;1164085
+Chrysopoeia.Walker.Benchmarks;Walker Walk+to_html - wikipedia;;50;1777674
+Chrysopoeia.Parser.Benchmarks;Eml Parse - wikipedia;;20;1446794
+Chrysopoeia.Walker.Benchmarks;Walker - parse only, wikipedia;;100;1161753
