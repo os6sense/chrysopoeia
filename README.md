@@ -1,4 +1,4 @@
-Chrysopoeia
+Inferno
 ===========
 An experimental transformative selector-based templating system for
 Elixir.
