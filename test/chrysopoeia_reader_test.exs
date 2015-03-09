@@ -14,7 +14,7 @@ defmodule Chrysopoeia.Reader.Test do
   end
 
   test_with_mock "read with a file returns a binary", File,
-      [read: fn(_path) -> "<html></html>" end] do
+      [read: fn(_path) -> {:ok, "<html></html>"} end] do
     assert Chrysopoeia.Reader.read("mocked_file.html") == "<html></html>"
   end
 end

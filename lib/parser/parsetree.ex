@@ -6,8 +6,9 @@ defmodule Chrysopoeia.Parser.ParseTree do
   require Chrysopoeia.Parser.ParseTree.Walker.Functions, as: Functions
   alias Chrysopoeia.Selector.CSS, as: CSS
 
-  def walk(t),      do: Walker.walk(t) |> elem(0)
-  def walk(t, fns), do: Walker.walk(t, fns) |> elem(0)
+  def walk(parse_tree),      do: Walker.walk(parse_tree) |> elem(0)
+  def walk(parse_tree, fns), do: Walker.walk(parse_tree, fns) |> elem(0)
+  def walk(parse_tree, fns, all_elems), do: Walker.walk(parse_tree, fns) 
 
   def find(parse_tree, selector) when is_binary(selector) do
     Walker.walk(parse_tree, [Functions.function(:find, CSS.create(selector) )])

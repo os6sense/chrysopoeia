@@ -1,4 +1,4 @@
-
+import Chrysopoeia.Parser.Transform 
 
 # A simple transform to include the body of one file inside another
 # e.g. post/edit.html inside the content are of layout/main.html 
@@ -23,6 +23,21 @@
   #end
 #end
 
+deftransform Extract do
+  @source "/home/leej/Elixir/chrysopoeia/test/templates/post/edit.html"
+  extract content
+end
+
+deftransform PrependText do
+  @source "/home/leej/Elixir/chrysopoeia/test/templates/post/edit.html"
+  extract content
+
+  prepend_text action_title do
+    model[:action]
+  end
+end
+
+
 deftransform PostEdit do
   # This is the name of the file to transform. A .html extension is assumed.
   @source "templates/post/edit"
@@ -40,7 +55,7 @@ deftransform PostEdit do
   # we have :
   # insert_text action_title do
   prepend_text action_title do
-    model[:action]
+    model[:action_title]
   end
 
   # Will replace the value of the "value" attribute of the
@@ -77,23 +92,30 @@ defmodule Transforms.Simple.Test do
 
   def assert_eq(left, right), do: assert left == right
 
-  # Okay lets deal with the PostEdit transforms first.
-  test "applys the transforms to a file" do
-
-    # #apply can be our pipelining op maybe?
-    #transformed = Transforms.apply(conn, PostEdit)
-    model = [{:action, :create}, {:post_id, "1"}, 
-             {:post_date, "022/01/2015"}, {:post_body, "First post wow!"}]
-
-    # Ohhh far nicer.
-    PageEdit.transform(model)
-
+  test "extract" do
+    assert_eq Extract.transform("") |> List.first |> elem(1) , [{"id", "content"}]
   end
+
+  test "prepend_text" do
+    model = [{:action_title, "Create"}]
+    assert_eq PrependText.transform(model) , []
+  end
+
+  # Okay lets deal with the PostEdit transforms first.
+  #test "applys the transforms to a file" do
+    ## #apply can be our pipelining op maybe?
+    ##transformed = Transforms.apply(conn, PostEdit)
+    #model = [{:action, :create}, {:post_id, "1"}, 
+             #{:post_date, "022/01/2015"}, {:post_body, "First post wow!"}]
+
+    ## Ohhh far nicer.
+    #PostEdit.transform(model)
+  #end
 
   test "inserts one file inside of another" do
     # This begs the queston of how one composes transforms?
-    #PostEdit 
-      #|> EditPage.apply
+    # PostEdit.transform(model)
+      #|> EditPage.transform(model)
     
     #transformed = Transforms.apply(conn, transforms)
   end

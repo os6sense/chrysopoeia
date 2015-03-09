@@ -37,6 +37,7 @@ defmodule Chrysopoeia.Parser.ParseTree.Walker.Functions do
       }
   end
 
+  # todo, need an insert
 
   @doc ~S"""
     Order the list of function tuples fns by the atom order in fns_order

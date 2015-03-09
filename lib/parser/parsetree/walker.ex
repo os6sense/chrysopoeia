@@ -63,6 +63,7 @@ defmodule Chrysopoeia.Parser.ParseTree.Walker do
   end
 
   # On decent the children become the siblings and the children are replaced.
+  # TODO: This is by far the most expensive function - look at optimisation
   def update_meta(meta, {e, a, c}, idx \\ 0) do
     c_len = length(c)
     #Logger.debug "UPDATE META PRE: #{inspect meta}"

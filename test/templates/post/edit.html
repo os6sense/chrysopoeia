@@ -1,9 +1,3 @@
-<!-- 
-    Everything between here and the folowing end tag will be 
-     discarded when the transform is run. This is the designer part
-     of the content where the designer can basically just treat the 
-     page as html without worrying about the layout etc.
--->
 <html>
 <head>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
@@ -22,16 +16,14 @@
     <div id="header">
       This is the top of the page.
     </div>
-<!-- End of "discarded" html -->
- 
-<!-- the following div, with the content id, is what will be extracted 
-     and included into the layout -->
+
     <div id="content">
+
 <h1 id="action_title">The word "Editing" or "Creating" should be introduced before this</h1>
 
-<div class="errors" id="form_errors">
-Any errors with submitting the post will appear here, if there are no errors
-it will be deleted.
+  <div class="errors" id="form_errors">
+  Any errors with submitting the post will appear here, if there are no errors
+  it will be deleted.
 </div>
 
 <form>
@@ -63,8 +55,6 @@ it will be deleted.
 </form>
 
     </div>
-
-<!-- again, everything onwards will be discarded -->
 
     <div id="footer">
       THIS is the bottom of the page.
