@@ -1,11 +1,14 @@
 
 defmodule Chrysopoeia.Selector.CSS.Compiler.Macros do
 
+  # test to check if the element passed to the selector function matches the
+  # type within the map
   defmacro element_matches_type?(e, type) do
     quote do
       unquote(e) == unquote(type)
     end
   end
+
 
   defmacro has_attribute?(attributes, attribute_name) do
     quote do

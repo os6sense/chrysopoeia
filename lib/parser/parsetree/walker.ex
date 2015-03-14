@@ -76,9 +76,18 @@ defmodule Chrysopoeia.Parser.ParseTree.Walker do
   @doc ~S""" 
     matches a text node. 
   """
-  def _walk(text , _fns, acc, meta) when is_binary(text) do
+  def _walk(text , fns, acc, meta) when is_binary(text) do
     #Logger.debug "TEXT NODE 2 - #{inspect text} || #{String.strip(text)}"
     #Logger.debug "TEXT NODE 2 META: #{inspect meta}"
+
+    # The mochiweb parser leaves whitespacing in, possibly only as an artifact
+    # of testing, hence we clean the text here. 
+    
+    # I get the feeling that the fact this isn't a function applied to the
+    # tree is indicative that something is wrong in the design.
+
+    #IO.puts "TEXT WALK #{text}"
+    #apply_functions(fns, text, meta, acc)
     {String.strip(text), acc}
   end
 
@@ -91,7 +100,7 @@ defmodule Chrysopoeia.Parser.ParseTree.Walker do
   # matches a text node with children
   def _walk(t = { _, _, [c]}, fns, acc, meta) when is_binary(c) do
     #Logger.debug "TEXT NODE 3 - #{inspect t} -- META: #{inspect meta}"
-    #apply_functions(fns, t, update_meta(meta, t, 0), acc)
+    #IO.puts "TEXT WITH CHILDREN #{c}"
     apply_functions(fns, t, update_meta(meta, t, 0), acc)
   end
 
@@ -146,9 +155,21 @@ defmodule Chrysopoeia.Parser.ParseTree.Walker do
     {{}, []}
   end
 
+  defp apply_functions(fns, text, meta, acc) when is_binary(text) do
+    Enum.reduce(fns, acc, fn
+      ({_tag, fun}, lacc) -> fun.({:TEXT, :TEXT, text}, meta, lacc) 
+    end)
+
+  end
+
   # Apply the fncs to the node 
   defp apply_functions(fns, t = {e, a, c}, meta, acc) do
-    Enum.reduce([acc] ++ fns, fn({_tag, fun}, lacc) -> fun.({e, a, c}, meta, lacc) end)
+    #IO.puts "APPLY #{inspect acc}"
+    #Enum.reduce([acc] ++ fns, fn({_tag, fun}, lacc) -> IO.puts inspect lacc; fun.({e, a, c}, meta, lacc) end)
+
+    Enum.reduce(fns, acc, fn
+      ({_tag, fun}, lacc) -> fun.({e, a, c}, meta, lacc) 
+    end)
   end
 
   # ========================= 
