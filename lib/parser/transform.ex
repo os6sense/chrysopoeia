@@ -5,11 +5,12 @@ defmodule Chrysopoeia.Parser.Transform do
   """
   require Chrysopoeia.Parser.ParseTree, as: PT
   require Chrysopoeia.Accumulator, as: Accumulator
+
   alias Chrysopoeia.Selector.CSS, as: CSS
 
-  def transform(t = {_, _, _}, fns) do
-    PT.walk(t, fns)
-  end
+  #def transform(t = {_, _, _}, fns) do
+    #PT.walk(t, fns)
+  #end
 
   #def apply(model, transforms) do
   #end
@@ -23,25 +24,19 @@ defmodule Chrysopoeia.Parser.Transform do
     end
   end
 
-  @doc ~S"""
-    Creates a new transform
+  #defmacro create(selector, do: blk) do
+    #quote do
+      #fn (t = {_, _, _}, acc) 
+        #-> if CSS.match(t, unquote(selector)), do: unquote(blk).(t), else: t
+      #end
+    #end
+  #end
 
-    selector, block
-  """
-  defmacro create(selector, do: blk) do
-    quote do
-      fn (t = {_, _, _}, acc) 
-        -> if CSS.match(t, unquote(selector)), do: unquote(blk).(t), else: t
-      end
-    end
-  end
-
-
-  def attribute(selector, attribute, new_value) do
-    create(selector) do
-      attribute_set(attribute, new_value)
-    end
-  end
+  #def attribute(selector, attribute, new_value) do
+    #create(selector) do
+      #attribute_set(attribute, new_value)
+    #end
+  #end
 
   # ========= ABOVE IS PROTOTYPING CODE
 
@@ -57,89 +52,13 @@ defmodule Chrysopoeia.Parser.Transform do
   #end
 
 
-  # ============= TEXT FUNCTIONS =================
-  # Generic macro to dry up the various text alteration macros
-  # id: id of the css element 
-  # op: the function to perform, used only in creation to uniquely 
-  #     identify the transform function for runtime creation
-  # text: will be replaced in the body of the calling function with the
-  #       value of the text matched within the element tuple
-  defmacro alter_text(id, op, text, do: body) do
-    attr_id = id |> Atom.to_string
-    quote do
-      def unquote(String.to_atom("#{Atom.to_string(op)}_" <> attr_id))(model) do
-        var!(model) = model
-        selector = CSS.create("##{unquote(attr_id)}")
-
-        {:transform, fn
-          (t = {e, a, unquote(text)}, meta, acc) -> 
-            if CSS.match(e, a, meta, selector), 
-              do: t = {e, a, [unquote(body)]}
-
-            if is_tuple(acc), 
-              do: acc = acc |> elem(1)
-
-            {t, acc }
-          end}
-        end
-        
-      @fns @fns ++ [ String.to_atom("#{Atom.to_string(unquote(op))}_" <> unquote(attr_id)) ]
-    end
-  end
-
-  defmacro prepend_text({id, _, _}, do: body) do
-    quote do
-      alter_text(unquote(id), :prepend, text) do
-        unquote(body) <> List.first(text)
-      end
-    end
-  end
-
-  defmacro append_text({id, _, _}, do: body) do
-    quote do
-      alter_text(unquote(id), :append, text) do
-        List.first(text) <> unquote(body)
-      end
-    end
-  end
-
-  defmacro replace_text({id, _, _}, do: body) do
-    quote do
-      alter_text(unquote(id), :append, text) do
-        unquote(body)
-      end
-    end
-  end
-
-  # WORKING!!
-  #defmacro prepend_text({id, _e_meta, _params}, do: body) do
-    #attr_id = id |> Atom.to_string
-    #quote do
-      #def unquote(String.to_atom("prepend_" <> attr_id))(model) do
-        #var!(model) = model
-
-        #selector = CSS.create("##{unquote(attr_id)}")
-
-        #{:transform, fn
-          #(t = {e, a, c}, meta, acc) -> 
-            #if CSS.match(e, a, meta, selector), 
-              #do: t = {e, a, [model[:action_title] <> List.first(c)]}
-
-            #if is_tuple(acc), 
-              #do: acc = acc |> elem(1)
-
-            #{t, acc }
-          #end}
-        #end
-        
-      #@fns @fns ++ [ String.to_atom("prepend_" <> unquote(attr_id)) ]
-    #end
-  #end
-
-  
   # ============= ATTRIBUTE FUNCTIONS =================
   defmacro replace_attribute(id, do: body) do
   end
+
+
+
+
   # ============= NODE FUNCTIONS =================
   # Node based functions
   defmacro replace(id, params, do: body) do
@@ -177,8 +96,12 @@ defmodule Chrysopoeia.Parser.Transform do
   defmacro deftransform(name, do: body) do
     quote do
       import  Chrysopoeia.Parser.Transform 
+      import Chrysopoeia.Parser.Transform.Text
+      import Chrysopoeia.Parser.Transform.Attibute
+
       require Chrysopoeia.Parser.ParseTree, as: PT
-      alias   Chrysopoeia.Selector.CSS, as: CSS
+
+      alias   Chrysopoeia.Selector.CSS,     as: CSS
 
       require Logger
 
@@ -225,9 +148,7 @@ defmodule Chrysopoeia.Parser.Transform do
             parse_tree |> elem(0) 
           end
         end
-
-
-      end # modele end
+      end # model end
     end # quote end
   end
 end

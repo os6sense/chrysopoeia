@@ -155,20 +155,31 @@ defmodule Chrysopoeia.Parser.ParseTree.Walker do
     {{}, []}
   end
 
-  defp apply_functions(fns, text, meta, acc) when is_binary(text) do
-    Enum.reduce(fns, acc, fn
-      ({_tag, fun}, lacc) -> fun.({:TEXT, :TEXT, text}, meta, lacc) 
-    end)
+  #defp apply_functions(fns, text, meta, acc) when is_binary(text) do
+    #Enum.reduce(fns, acc, fn
+      #({_tag, fun}, lacc) -> fun.({:TEXT, :TEXT, text}, meta, lacc) 
+    #end)
 
-  end
+  #end
 
   # Apply the fncs to the node 
   defp apply_functions(fns, t = {e, a, c}, meta, acc) do
     #IO.puts "APPLY #{inspect acc}"
     #Enum.reduce([acc] ++ fns, fn({_tag, fun}, lacc) -> IO.puts inspect lacc; fun.({e, a, c}, meta, lacc) end)
 
+    #Enum.reduce(fns, acc, fn
+      #({_tag, fun}, lacc) -> fun.({e, a, c}, meta, lacc) 
+    #end)
+
     Enum.reduce(fns, acc, fn
-      ({_tag, fun}, lacc) -> fun.({e, a, c}, meta, lacc) 
+      ({_, fun}, lacc) -> 
+        if is_tuple(lacc) do
+          tree = lacc |> elem(0)
+        else
+          tree = t
+        end
+          
+        fun.(tree, meta, lacc) 
     end)
   end
 

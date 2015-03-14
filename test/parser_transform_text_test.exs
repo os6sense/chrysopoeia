@@ -1,52 +1,57 @@
 import Chrysopoeia.Parser.Transform 
 
-# A simple transform to include the body of one file inside another
-# e.g. post/edit.html inside the content are of layout/main.html 
-
-## NB COMMENTED OUT PURELY WHILE I WORK ON THE POSTEDIT page level transforms.
-#deftransform EditPage do
-  #@source "templates/layout/main"
-
-  ## am I going to have to supply an apply macro - what about when there 
-  ## are multiple transforms?
-  ##insert edit_form("div[id=content]", transformed) do
-    ##insert_transformed(transformed)
-  ##end
-  ## alternate idea - replace anything within the content id element with
-  ## the transformed.
-
-  #replace content transformed
-
-  ## Page title will need changing parameter or model?
-  #replace_text title("title")  do
-    #model[:title]
-  #end
-#end
-
+# Example of a very simple transform to extract the content of a file
 deftransform Extract do
   @source "/home/leej/Elixir/chrysopoeia/test/templates/post/edit.html"
   extract content
 end
 
+# A simple transform with text prepended to one of the elements
 deftransform PrependText do
   @source "/home/leej/Elixir/chrysopoeia/test/templates/post/edit.html"
   extract action_title
 
+  prepend_text action_title(:action_title) 
+
   prepend_text action_title do
-    model[:action_title]
+   "FOO. #{model[:action_title]} BAR."
   end
 end
 
+# A simple transform with text appended to one of the elements
 deftransform AppendText do
   @source "/home/leej/Elixir/chrysopoeia/test/templates/post/edit.html"
   extract action_title
 
-  append_text action_title do
-    model[:action_title]
-  end
+  prepend_text action_title, do: model[:action_title]
+  append_text action_title, do: model[:action_title]
+end
+
+# A simple transform with text replaced, then prepended and appended to one of
+# the elements
+deftransform ReplaceText do
+  @source "/home/leej/Elixir/chrysopoeia/test/templates/post/edit.html"
+  extract action_title
+
+  replace_text action_title, do: model[:replacement]
+  prepend_text action_title, do: model[:before]
+  append_text action_title, do: model[:after]
+end
+
+# A simple transform showing that prepended and appended to one of
+# the elements and THEN replacing will overwrite the other changes.
+deftransform ReplaceTextOverwrite do
+  @source "/home/leej/Elixir/chrysopoeia/test/templates/post/edit.html"
+  extract action_title
+
+  prepend_text action_title, do: model[:before]
+  append_text action_title, do: model[:after]
+  replace_text action_title, do: model[:replacement]
 end
 
 
+
+# A complete example!
 #deftransform PostEdit do
   ## This is the name of the file to transform. A .html extension is assumed.
   #@source "templates/post/edit"
@@ -93,9 +98,6 @@ end
   ##end
 #end
 
-# should I be looking at inserting one transform inside another at
-# this point? Yes I should I think
-
 defmodule Transforms.Simple.Test do
   use ExUnit.Case
 
@@ -108,8 +110,27 @@ defmodule Transforms.Simple.Test do
   test "prepend_text" do
     model = [{:action_title, "Creating "}]
     
-    assert_eq PrependText.transform(model) , [{"h1", [{"id", "action_title"}], ["Creating The word \"Editing\" or \"Creating\" should be introduced before this"]}]
+    assert_eq PrependText.transform(model),
+      [{"h1", [{"id", "action_title"}], ["FOO. Creating  BAR.Creating The word \"Editing\" or \"Creating\" should be introduced before this"]}]
   end
+
+  test "append_text" do
+    model = [{:action_title, "Creating "}]
+    assert_eq AppendText.transform(model),
+      [{"h1", [{"id", "action_title"}], ["Creating The word \"Editing\" or \"Creating\" should be introduced before thisCreating "]}]
+  end
+
+  test "replace_text" do
+    model = [{:before, "Start of "}, {:after, " ..."}, {:replacement, "new text"}]
+    assert_eq ReplaceText.transform(model) , [{"h1", [{"id", "action_title"}], ["Start of new text ..."]}]
+  end
+
+  test "replace_text_overwrite" do
+    model = [{:before, "Start of "}, {:after, " ..."}, {:replacement, "new text"}]
+    assert_eq ReplaceTextOverwrite.transform(model) , [{"h1", [{"id", "action_title"}], ["new text"]}]
+  end
+
+
 
   # Okay lets deal with the PostEdit transforms first.
   #test "applys the transforms to a file" do
