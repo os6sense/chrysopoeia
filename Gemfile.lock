@@ -1,7 +1,7 @@
 PATH
   remote: ~/Elixir/guard-elixir
   specs:
-    guard-elixir (0.0.3)
+    guard-elixir (0.0.31)
       guard
       guard-compat (~> 1.0)
 
@@ -23,7 +23,7 @@ GEM
       thor (>= 0.18.1)
     guard-compat (1.2.1)
     hitimes (1.2.2)
-    listen (2.8.5)
+    listen (2.9.0)
       celluloid (>= 0.15.2)
       rb-fsevent (>= 0.9.3)
       rb-inotify (>= 0.9)

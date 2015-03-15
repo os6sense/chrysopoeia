@@ -147,7 +147,7 @@ defmodule Chrysopoeia.Parser.ParseTree.Walker do
     apply_functions(fns, t, update_meta(meta, t, 0), acc)
   end
 
-  @doc ~S"""
+  @doc """
     Matches a totally empty element.
   """
   def _walk({}, _fns, _acc, _meta) do
@@ -155,24 +155,12 @@ defmodule Chrysopoeia.Parser.ParseTree.Walker do
     {{}, []}
   end
 
-  #defp apply_functions(fns, text, meta, acc) when is_binary(text) do
-    #Enum.reduce(fns, acc, fn
-      #({_tag, fun}, lacc) -> fun.({:TEXT, :TEXT, text}, meta, lacc) 
-    #end)
-
-  #end
-
   # Apply the fncs to the node 
   defp apply_functions(fns, t = {e, a, c}, meta, acc) do
-    #IO.puts "APPLY #{inspect acc}"
-    #Enum.reduce([acc] ++ fns, fn({_tag, fun}, lacc) -> IO.puts inspect lacc; fun.({e, a, c}, meta, lacc) end)
-
-    #Enum.reduce(fns, acc, fn
-      #({_tag, fun}, lacc) -> fun.({e, a, c}, meta, lacc) 
-    #end)
-
     Enum.reduce(fns, acc, fn
       ({_, fun}, lacc) -> 
+        # Do I still need to fix the accumulator in the transforms?
+        # seems I do but look into that, I may be repeating work.
         if is_tuple(lacc) do
           tree = lacc |> elem(0)
         else

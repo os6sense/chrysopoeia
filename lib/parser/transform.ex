@@ -8,13 +8,6 @@ defmodule Chrysopoeia.Parser.Transform do
 
   alias Chrysopoeia.Selector.CSS, as: CSS
 
-  #def transform(t = {_, _, _}, fns) do
-    #PT.walk(t, fns)
-  #end
-
-  #def apply(model, transforms) do
-  #end
-
   defmacro attribute_set(name, val) do
     quote do
       match_args = fn ({an, av}) 
@@ -24,41 +17,6 @@ defmodule Chrysopoeia.Parser.Transform do
     end
   end
 
-  #defmacro create(selector, do: blk) do
-    #quote do
-      #fn (t = {_, _, _}, acc) 
-        #-> if CSS.match(t, unquote(selector)), do: unquote(blk).(t), else: t
-      #end
-    #end
-  #end
-
-  #def attribute(selector, attribute, new_value) do
-    #create(selector) do
-      #attribute_set(attribute, new_value)
-    #end
-  #end
-
-  # ========= ABOVE IS PROTOTYPING CODE
-
-  # I dont want to break the above just yet
-  #defmacro create_query(selector, t, acc, do: blk) do
-    #quote do
-      #{:query, fn 
-        #(unquote(t) = t = {e, a, _c}, meta, unquote(acc) = acc)
-          #-> if CSS.match(e, a, meta, unquote(selector)), 
-               #do: unquote(blk), else: {t, acc}
-        #end}
-    #end
-  #end
-
-
-  # ============= ATTRIBUTE FUNCTIONS =================
-  defmacro replace_attribute(id, do: body) do
-  end
-
-
-
-
   # ============= NODE FUNCTIONS =================
   # Node based functions
   defmacro replace(id, params, do: body) do
@@ -66,6 +24,8 @@ defmodule Chrysopoeia.Parser.Transform do
   defmacro insert(id, params, do: body) do
   end
   defmacro append(id, params, do: body) do
+  end
+  defmacro delete(id, params, do: body) do
   end
 
   # ==== extract is really just a find with some hand waving to deal
@@ -95,9 +55,9 @@ defmodule Chrysopoeia.Parser.Transform do
   # ======== DEFTRANSFORM ==================
   defmacro deftransform(name, do: body) do
     quote do
-      import  Chrysopoeia.Parser.Transform 
+      import Chrysopoeia.Parser.Transform 
       import Chrysopoeia.Parser.Transform.Text
-      import Chrysopoeia.Parser.Transform.Attibute
+      import Chrysopoeia.Parser.Transform.Attribute
 
       require Chrysopoeia.Parser.ParseTree, as: PT
 
@@ -111,6 +71,10 @@ defmodule Chrysopoeia.Parser.Transform do
         unquote(body)
 
         def init(source_file \\ @source) do
+          unless String.ends_with?(source_file, ".html") do
+            source_file = source_file <> ".html"
+          end
+
           Chrysopoeia.Reader.read(source_file) 
             |> Chrysopoeia.Parser.Floki.parse
         end
@@ -148,7 +112,7 @@ defmodule Chrysopoeia.Parser.Transform do
             parse_tree |> elem(0) 
           end
         end
-      end # model end
-    end # quote end
+      end 
+    end 
   end
 end
