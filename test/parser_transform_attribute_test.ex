@@ -1,5 +1,5 @@
 
-defmodule Chrysopoeia.Parser.Transform.Attibute do
+defmodule Chrysopoeia.Parser.Transform.Attibute.Test do
   
   # the old test
    test "transform" do
@@ -14,5 +14,6 @@ defmodule Chrysopoeia.Parser.Transform.Attibute do
      #|> assert_eq {"p", [{"class", "tc"}, {"id", "abcde"}], ["test 2"]}
    end
 
+   # do the post id first
 end
 

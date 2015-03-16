@@ -77,10 +77,24 @@ defmodule Chrysopoeia.Parser.Transform.Text do
     end
   end
 
-  # =========== PREPEND
   #============================================================================
-  # puts the contents of body (which should evaluate to a string)
-  # at the start of the html element with the id which matches the
+  # the prepend, append and replace macros are more or less cut and paste
+  # copies of each other since I'm having trouble consolating the code into
+  # just two macro froms beyond what you see here, however I need to look at
+  # this at a later date. TODO
+  #============================================================================
+
+  # ==== prepend_text/2
+  # puts the contents of body (which should evaluate to a string) at the start
+  # of the html element. Supports the forms:
+  #
+  #   prepend_text id(:key) do <body> end
+  #     or
+  #   prepend_text select("<css selector>") do <body> end
+  #
+  # When the form with :key is used then the Keyword List passed into
+  # the transform function will be queried for the value referenced
+  # by :key.
   defmacro prepend_text({id, _, params}, do: body) do
     quote do
       alter_text(unquote(id), :prepend_2, text, unquote(params)) do
@@ -89,8 +103,11 @@ defmodule Chrysopoeia.Parser.Transform.Text do
     end
   end
 
-  # supports use of the prepend text in the form 
-  #   prepend_text id(:model_atom)
+  # ==== prepend_text/1
+  # Supports use of the prepend text in the form:
+  #   prepend_text id(:key) 
+  #     or
+  #   prepend_text select("<css selector>", :key) 
   defmacro prepend_text({id, _, params}) do
     if id == :select, 
       do: [ selector | params ] = params
@@ -105,9 +122,10 @@ defmodule Chrysopoeia.Parser.Transform.Text do
     end
   end
 
-  #========= APPEND
+  #==== append_text/2
+  # See prepend_text/2 for a fuller description.
   # puts the contents of body (which should evaluate to a string)
-  # at the start of the html element with the id which matches the
+  # at the start of the html element 
   defmacro append_text({id, _, params}, do: body) do
     quote do
       alter_text(unquote(id), :append_2, text, unquote(params)) do
@@ -116,8 +134,8 @@ defmodule Chrysopoeia.Parser.Transform.Text do
     end
   end
 
-  # supports use of the prepend text in the form 
-  #   prepend_text id(:model_atom)
+  #==== append_text/1
+  # See prepend_text/1 for a fuller description.
   defmacro append_text({id, _, params}) do
     if id == :select, 
       do: [ selector | params ] = params
@@ -132,25 +150,26 @@ defmodule Chrysopoeia.Parser.Transform.Text do
     end
   end
 
-  # ==== REPLACE
+  #==== replace_text/2
+  # See prepend_text/2 for a fuller description.
   # puts the contents of body (which should evaluate to a string)
   # at the start of the html element with the id which matches the
   defmacro replace_text({id, _, params}, do: body) do
     quote do
-      alter_text(unquote(id), :append_2, text, unquote(params)) do
+      alter_text(unquote(id), :replace_2, text, unquote(params)) do
         unquote(body) 
       end
     end
   end
 
-  # supports use of the prepend text in the form 
-  #   prepend_text id(:model_atom)
+  #==== replace_text/1
+  # See prepend_text/1 for a fuller description.
   defmacro replace_text({id, _, params}) do
     if id == :select, 
       do: [ selector | params ] = params
 
     quote do
-      alter_text(unquote(id), :append_1, text, unquote(selector) ) do
+      alter_text(unquote(id), :replace_1, text, unquote(selector) ) do
         model = var!(model) # Make the model available within this context
         Enum.map(unquote(params), fn
           (param) -> model[param] 
@@ -158,5 +177,4 @@ defmodule Chrysopoeia.Parser.Transform.Text do
       end
     end
   end
-
 end
